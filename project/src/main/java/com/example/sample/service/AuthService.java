@@ -6,6 +6,7 @@ import com.example.sample.common.enums.MemberEnum;
 import com.example.sample.common.utils.CodeGenerator;
 import com.example.sample.common.utils.JwtUtils;
 import com.example.sample.common.utils.ResponseUtils;
+import com.example.sample.common.utils.SecurityUtils;
 import com.example.sample.domain.dto.request.ReqSignInEmailDTO;
 import com.example.sample.domain.dto.response.ResTokenDTO;
 import com.example.sample.domain.dto.request.ReqSignInDTO;
@@ -34,7 +35,7 @@ public class AuthService {
     private final JwtUtils jwt ;
     private final CodeGenerator generator;
     private final SecurityProperties securityProperties;
-
+    private final SecurityUtils security;
     /**
      * 로그인
      * @param data
@@ -44,8 +45,12 @@ public class AuthService {
     public ResponseEntity signIn(ReqSignInDTO data) {
         if( data.getId() == null || data.getPassword() ==null ) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
         // id, pw  확인
-        Member user = repositoryMember.findByIdAndPassword(data.getId(), data.getPassword());
-        return commonSignIn(user);
+        try {
+            Member user = repositoryMember.findByIdAndPassword(data.getId(), security.getAESEncrypt(data.getPassword()));
+            return commonSignIn(user);
+        }catch (Exception e) {
+            return response.makeOtherResponse(HttpStatus.FORBIDDEN);
+        }
     }
 
     /**
@@ -91,7 +96,7 @@ public class AuthService {
         // 로그인 기록을 저장 한뒤 응답
         repositoryAuth.save(memberAccess);
         user.setAcceptAt(LocalDateTime.now());
-        return     response.makeSuccessResponse(ResTokenDTO.builder().token(token).build());
+        return response.makeSuccessResponse(ResTokenDTO.builder().token(token).build());
     }
 
     /**

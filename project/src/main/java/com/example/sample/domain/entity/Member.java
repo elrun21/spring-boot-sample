@@ -22,11 +22,11 @@ public class Member extends BaseTime{
     private Long idx;
 
     @ApiModelProperty("사용자 아이디")
-    @Column
+    @Column(unique = true)
     private String id ;
 
     @ApiModelProperty("사용자 이메일")
-    @Column
+    @Column(unique = true)
     private String email ;
 
     @ApiModelProperty("사용자 비밀번호")

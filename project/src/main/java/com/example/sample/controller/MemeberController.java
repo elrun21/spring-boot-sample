@@ -51,9 +51,11 @@ public class MemeberController {
     public ResponseEntity getUsers(
             @ApiParam(value = "마지막 user Idx 값 , 이전 페이지 경우 마지막 idx + size*2 값으로 호출" , required = true)
             @RequestParam("lastIdx") Long lastIdx,
+            @ApiParam(value = "마지막 user Idx 값 , 이전 페이지 경우 마지막 idx + size*2 값으로 호출" , required = true)
+            @RequestParam("prevIdx") Long prevIdx,
             @ApiParam(value = "한페이지 사이즈 값 ( 0 은 불가능 ) ", required = true)
             @RequestParam("size") int size  ) {
-        return  service.findUsers(lastIdx , size );
+        return  service.findUsers(lastIdx ,prevIdx ,size );
     }
 
     @ApiOperation(value = "회원 정보 수정" , response = CommonResponseDTO.class)
@@ -66,5 +68,6 @@ public class MemeberController {
             @RequestBody ReqMemberModifyDTO data ) {
         return  service.updateMemberInfo( data , token );
     }
+
 
 }

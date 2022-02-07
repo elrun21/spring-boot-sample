@@ -22,7 +22,7 @@ public class AuthController {
 
     @ApiOperation(value = "로그인" , response = CommonResponseDTO.class)
     @PostMapping("/sign-in")
-    public ResponseEntity signIn(@Valid  @RequestBody ReqSignInDTO data ) {
+    public ResponseEntity signIn(@Valid  @RequestBody ReqSignInDTO data ) throws Exception {
         return  service.signIn(data);
     }
 

@@ -7,6 +7,7 @@ import com.example.sample.common.exceptions.TokenValidationIdException;
 import com.example.sample.common.utils.JwtUtils;
 import com.example.sample.common.utils.LogUtils;
 import com.example.sample.common.utils.ResponseUtils;
+import com.example.sample.common.utils.SecurityUtils;
 import com.example.sample.domain.dto.request.ReqMemberModifyDTO;
 import com.example.sample.domain.dto.response.ResMemberInfoDTO;
 import com.example.sample.domain.dto.response.ResMemberInfosDTO;
@@ -38,6 +39,8 @@ public class MemberService {
     private final AuthRepository repositoryAuth;
     private final ResponseUtils response;
     private final LogUtils logUtils;
+    private final SecurityUtils security;
+
 
     /**
      * 한 사용자만 조회
@@ -66,14 +69,19 @@ public class MemberService {
 
     /**
      * 유저 리스트 조회 ( cursor 페이징 )
-     * @param idx
+     * @param lastIdx
+     * @param prevIdx
      * @param limit
      * @return
      */
-    public ResponseEntity findUsers( Long idx , int limit ) {
+    public ResponseEntity findUsers( Long lastIdx , Long prevIdx, int limit ) {
         if( limit == 0 ) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
-        List<ResMemberInfosDTO> result = repositoryMemberInfo.findAllMembers( idx , limit );
-        return response.makeSuccessResponse( result );
+        if( lastIdx != 0 && prevIdx !=0 ) response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+        if ( lastIdx !=0 ){
+            return response.makeSuccessResponse( repositoryMemberInfo.findAllMembers( lastIdx , true , limit ) );
+        }else{
+            return response.makeSuccessResponse( repositoryMemberInfo.findAllMembers( prevIdx , false , limit ) );
+        }
     }
 
     /**
@@ -91,7 +99,7 @@ public class MemberService {
              */
             Member newMember = repositoryMember.save(Member.MemberBuilder.aMember()
                     .withId(data.getId())
-                    .withPassword(data.getPassword())
+                    .withPassword( security.getAESEncrypt(data.getPassword()) )
                     .withLiveStatus("LIVE")
                     .withUserGrade(1)
                     .withEmail(data.getEmail())

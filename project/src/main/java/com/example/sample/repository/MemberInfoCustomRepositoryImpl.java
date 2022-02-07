@@ -17,7 +17,7 @@ public class MemberInfoCustomRepositoryImpl implements MemberInfoCustomRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ResMemberInfosDTO> findAllMembers(Long targetIdx, int size) {
+    public List<ResMemberInfosDTO> findAllMembers(Long targetIdx, boolean direction ,int size) {
         return queryFactory.select(
                     Projections.constructor(
                             ResMemberInfosDTO.class,
@@ -34,18 +34,22 @@ public class MemberInfoCustomRepositoryImpl implements MemberInfoCustomRepositor
                 .from(memberInfo)
                 .join(memberInfo.memberIdx, member)
                 .where(
-                        ltId(targetIdx)
+                        ltId(targetIdx, direction)
                 )
                 .orderBy(memberInfo.idx.desc())
                 .limit(size)
                 .fetch();
 
     }
-    private BooleanExpression ltId(Long idx) {
+    private BooleanExpression ltId(Long idx, boolean direction) {
         if (idx == null || idx == 0 ) {
             return null; // BooleanExpression 자리에 null이 반환되면 조건문에서 자동으로 제거된다
-        }else {
+        }
+        if(direction) {
             return memberInfo.idx.lt(idx);
+        }
+        else {
+            return memberInfo.idx.gt(idx);
         }
     }
 }
