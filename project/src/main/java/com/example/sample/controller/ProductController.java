@@ -2,7 +2,7 @@ package com.example.sample.controller;
 
 
 import com.example.sample.common.dto.CommonResponseDTO;
-import com.example.sample.service.MemberService;
+import com.example.sample.domain.dto.request.ReqSetProductDTO;
 import com.example.sample.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,10 +10,9 @@ import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class ProductController {
     private final ProductService service;
 
     @ApiOperation(value = "상품 조회", response = CommonResponseDTO.class)
-    @GetMapping("/product")
+    @GetMapping
     public ResponseEntity getProduct(
             @ApiParam(value = "[next 일 경우] 마지막 상품ID 값", required = true)
             @RequestParam("lastIdx") Long lastIdx,
@@ -35,4 +34,10 @@ public class ProductController {
         return service.findProduct(lastIdx, prevIdx, size);
     }
 
+
+    @ApiOperation(value = "상품 생성", response = CommonResponseDTO.class)
+    @PostMapping
+    public ResponseEntity setProduct( @Valid @RequestBody ReqSetProductDTO data) {
+        return service.setProduct(data);
+    }
 }

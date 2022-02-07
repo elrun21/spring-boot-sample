@@ -106,6 +106,7 @@ public class MemberService {
                     .withDeleteAt(null)
                     .build()
             );
+
             /**
              * 기본회원테이블 데이터 키를 기준으로 상세 내용 저장
              */

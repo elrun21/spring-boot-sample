@@ -2,8 +2,10 @@ package com.example.sample.controller;
 
 
 import com.example.sample.common.dto.CommonResponseDTO;
+import com.example.sample.domain.dto.request.ReqOrderDTO;
 import com.example.sample.domain.dto.request.ReqSignUpMembeDTO;
 import com.example.sample.service.MemberService;
+import com.example.sample.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,27 +25,22 @@ public class OrderController {
     private final OrderService service;
 
     @ApiOperation(value = "상품 주문", response = CommonResponseDTO.class)
-    @PostMapping("/order")
-    public ResponseEntity getProduct(@Valid @RequestBody ReqOrderDTO data) throws Exception  {
-        return service.makeOrder(lastIdx, prevIdx, size);
+    @PostMapping
+    public ResponseEntity makeOrder(@Valid @RequestBody ReqOrderDTO data) throws Exception  {
+        return service.makeOrder(data);
 
     }
 
-    @ApiOperation(value = "주문 내역 상세 조회" , response = CommonResponseDTO.class)
-    @GetMapping("/order/{idx}")
-    public ResponseEntity getOrderDetail(
-            @ApiParam(value = "검색할 user idx 값" , required = true)
-            @PathVariable Long idx
-    ) {
-        return  service.findOrderDetail(idx);
-    }
 
     @ApiOperation(value = "주문 내역 조회" , response = CommonResponseDTO.class)
-    @GetMapping("/order")
+    @GetMapping
     public ResponseEntity getOrder(
-            @ApiParam(value = "검색할 user idx 값" , required = true)
-            @PathVariable Long idx
-    ) {
-        return  service.findOrder(idx);
+            @ApiParam(value = "[next 일 경우] 리스트 마지막 주문 IDX 값", required = true)
+            @RequestParam("lastIdx") Long lastIdx,
+            @ApiParam(value = "[prev 일 경우] 리스트 처음 주문 IDX 값", required = true)
+            @RequestParam("prevIdx") Long prevIdx,
+            @ApiParam(value = "한페이지 사이즈 값 ( 0 은 불가능 ) ", required = true)
+            @RequestParam("size") int size) {
+        return service.findOrder(lastIdx, prevIdx, size);
     }
 }
