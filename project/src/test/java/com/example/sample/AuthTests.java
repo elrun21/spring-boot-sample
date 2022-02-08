@@ -2,9 +2,17 @@ package com.example.sample;
 
 import com.example.sample.domain.dto.request.ReqSignInDTO;
 import com.example.sample.domain.dto.request.ReqSignInEmailDTO;
+import com.example.sample.domain.dto.request.ReqSignUpMembeDTO;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.event.annotation.BeforeTestClass;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -14,14 +22,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Transactional
 public class AuthTests extends BaseTests{
-    private final String  DEFAULT_API_URL = "/api/auth";
+
+    private String url =  "/api/auth/sign-in";
+    private String url_sign_out =  "/api/auth/sign-out";
+    private String member_url =  "/api/member/sign-up";
+
     @Test
-    public  void 회원_로그인_컨트롤러_테스트() throws Exception {
+    public  void 회원_로그인_컨트롤러_성공_테스트() throws Exception {
+
+        ReqSignUpMembeDTO requestMake = new ReqSignUpMembeDTO();
+        requestMake.setId("test-02");
+        requestMake.setPassword("1234");
+        requestMake.setAddr("testaddr");
+        requestMake.setEmail("test02@gmail.com");
+        requestMake.setName("test02");
+        requestMake.setPhone("01012340002");
+
+        // When, Then
+        mockMvc.perform(post(member_url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content( objectMapper.writeValueAsString(requestMake) )        )
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print());
+
         ReqSignInDTO request = new ReqSignInDTO();
         request.setId("test-02");
         request.setPassword("1234");
 
-        String url = DEFAULT_API_URL+"/sign-in";
         // When, Then
         mockMvc.perform(post(url)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -31,125 +58,104 @@ public class AuthTests extends BaseTests{
     }
 
     @Test
-    public  void 회원_로그인_컨트롤러_실패_테스트() throws Exception {
+    public  void 회원_로그인_컨트롤러_실패_삭제된계정접속() throws Exception {
         /** 삭제된 계정 접속**/
         //given
         ReqSignInDTO request = new ReqSignInDTO();
         request.setId("test-01");
         request.setPassword("1234");
 
-        String url = DEFAULT_API_URL+"/sign-in";
-        // When, Then
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
-        /** 비밀번호 틀릴경우 **/
-        //given
-        request.setId("test-04");
-        request.setPassword("1234");
-        // When, Then
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
 
-        /** 없는 계정 접속**/
-        //given
-        request.setId("xxxxxxxxxxxnull");
-        request.setPassword("1234");
         // When, Then
         mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
-
-        /** 비밀번호 틀릴경우 **/
-        //given
-        request.setId("test-01");
-        request.setPassword("12345");
-        // When, Then
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
-
     @Test
-    public  void 회원_이메일_로그인_컨트롤러_테스트() throws Exception {
-        ReqSignInEmailDTO request = new ReqSignInEmailDTO();
-        request.setEmail("test@gmail.com");
-        request.setPassword("1234");
+    public  void 회원_로그인_컨트롤러_실패_비밀번호틀린경우() throws Exception {
+        ReqSignUpMembeDTO requestMake = new ReqSignUpMembeDTO();
+        requestMake.setId("test-02");
+        requestMake.setPassword("1234");
+        requestMake.setAddr("testaddr");
+        requestMake.setEmail("test02@gmail.com");
+        requestMake.setName("test02");
+        requestMake.setPhone("01012340002");
 
-        String url = DEFAULT_API_URL+"/sign-in";
         // When, Then
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
+        mockMvc.perform(post(member_url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content( objectMapper.writeValueAsString(requestMake) )        )
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print());
-    }
-
-    @Test
-    public  void 회원_이메일_로그인_컨트롤러_실패_테스트() throws Exception {
-        /** 삭제된 계정 접속**/
-        //given
-        ReqSignInDTO request = new ReqSignInDTO();
-        request.setId("test-01");
-        request.setPassword("1234");
-
-        String url = DEFAULT_API_URL+"/sign-in";
-        // When, Then
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
         /** 비밀번호 틀릴경우 **/
         //given
-        request.setId("test-04");
-        request.setPassword("1234");
+        ReqSignInDTO request = new ReqSignInDTO();
+        request.setId("test-02");
+        request.setPassword("1df234");
         // When, Then
         mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
-
+    }
+    @Test
+    public  void 회원_로그인_컨트롤러_실패_아이디가없음() throws Exception {
         /** 없는 계정 접속**/
         //given
+        ReqSignInDTO request = new ReqSignInDTO();
         request.setId("xxxxxxxxxxxnull");
         request.setPassword("1234");
         // When, Then
         mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
-                .andExpect(status().is4xxClientError())
-                .andDo(print());
-
-        /** 비밀번호 틀릴경우 **/
-        //given
-        request.setId("test-01");
-        request.setPassword("12345");
-        // When, Then
-        mockMvc.perform(post(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content( objectMapper.writeValueAsString(request) )        )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
 
 
     @Test
     public  void 회원_로그아웃_컨트롤러_성공() throws Exception {
-        String url = DEFAULT_API_URL+"/sign-out";
+        ReqSignUpMembeDTO requestMake = new ReqSignUpMembeDTO();
+        requestMake.setId("test-02");
+        requestMake.setPassword("1234");
+        requestMake.setAddr("testaddr");
+        requestMake.setEmail("test02@gmail.com");
+        requestMake.setName("test02");
+        requestMake.setPhone("01012340002");
+
+        // When, Then
+        mockMvc.perform(post(member_url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestMake)))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print());
+
+        ReqSignInDTO request = new ReqSignInDTO();
+        request.setId("test-02");
+        request.setPassword("1234");
+
+        // When, Then
+        MvcResult login = mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print())
+                .andReturn();
+        Map loginResult = objectMapper.readValue(login.getResponse().getContentAsString(), HashMap.class);
+
+        Map content = (Map) loginResult.get("content");
+        String token = (String) content.get("token");
+
+
+        String url = url_sign_out;
         // When, Then
         mockMvc.perform(post(url)
-                .header("token","eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2Mjc5NjUzNDEsImV4cCI6MTAwMTYyNzk2NTM0MCwiYXV0aCI6InRlc3QtZGVtb24tYXV0aC1rZXkiLCJpZHgiOjIwMywiaWQiOiJ0ZXN0LTAyIiwic2Vzc2lvbiI6IlNTNjI3OTY1MzQxODYifQ.NyrsRMaCmfzyhvzItVizJIiTCCRLu5EjHF3h2Wu5XEY" )
+                .header("token",token )
                 .contentType(MediaType.APPLICATION_JSON)
         )
                 .andExpect(status().is2xxSuccessful())
@@ -158,7 +164,9 @@ public class AuthTests extends BaseTests{
 
     @Test
     public  void 회원_로그아웃_컨트롤러_실패_테스트() throws Exception {
-        String url = DEFAULT_API_URL+"/sign-out";
+
+
+        String url = url_sign_out;
         /**    jwt 예외케이스 1 , 토큰 데이터 이상 **/
         // When, Then
         mockMvc.perform(post(url)

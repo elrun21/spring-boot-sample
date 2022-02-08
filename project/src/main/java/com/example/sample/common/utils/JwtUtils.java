@@ -91,6 +91,12 @@ public class JwtUtils {
         }
     }
 
+    public Long getUserIdx(String token){
+        TokenDTO claim = valid(token);
+        Claims data = claim.getData();
+        return Long.parseLong( String.valueOf(data.get("idx")) );
+    }
+
     private String  deletePrefix(String token ) {
         return token.replaceAll(TOKEN_PREFIX,"");
     }

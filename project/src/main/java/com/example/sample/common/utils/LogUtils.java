@@ -34,7 +34,7 @@ public class LogUtils {
     public String getErrorLog(Exception e){
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        pw.append("---------------------------------------------------------------------------\n");
+        pw.append("------------------------------------- ::: DEBUG ::: --------------------------------------\n");
         /** To do
          *
          */

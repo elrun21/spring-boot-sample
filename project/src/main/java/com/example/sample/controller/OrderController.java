@@ -35,12 +35,15 @@ public class OrderController {
     @ApiOperation(value = "주문 내역 조회" , response = CommonResponseDTO.class)
     @GetMapping
     public ResponseEntity getOrder(
-            @ApiParam(value = "[next 일 경우] 리스트 마지막 주문 IDX 값", required = true)
-            @RequestParam("lastIdx") Long lastIdx,
-            @ApiParam(value = "[prev 일 경우] 리스트 처음 주문 IDX 값", required = true)
-            @RequestParam("prevIdx") Long prevIdx,
+            @ApiParam(value = "(Header)로그인시 받은 토큰", required = true)
+            @RequestHeader(value = "token") String token,
+            @ApiParam(value = "검색기준 상품ID 값", required = false)
+            @RequestParam(required = false) Long targetIdx,
+            @ApiParam(value = "검색기준 상품 명", required = false)
+            @RequestParam(required = false) String name,
             @ApiParam(value = "한페이지 사이즈 값 ( 0 은 불가능 ) ", required = true)
-            @RequestParam("size") int size) {
-        return service.findOrder(lastIdx, prevIdx, size);
+            @RequestParam(required = true) int size) {
+        return service.findOrder( token,targetIdx, name , size);
     }
+
 }

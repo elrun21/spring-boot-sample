@@ -5,15 +5,17 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
-@Table(name = "PRODUCT")
+@Table(name = "PRODUCT_INFO")
 @Entity
 @Getter
 @Setter
+@DynamicUpdate
 @NoArgsConstructor
-public class Product {
+public class ProductInfo extends BaseTime{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idx;
@@ -44,7 +46,7 @@ public class Product {
 
     public static final class ProductBuilder {
         private int salePrice;
-        private int originPrice;
+        private int productPrice;
         private String productName;
         private String productType;
         private Long category;
@@ -57,46 +59,46 @@ public class Product {
             return new ProductBuilder();
         }
 
-        public ProductBuilder withSalePrice(int salePrice){
+        public ProductInfo.ProductBuilder withSalePrice(int salePrice){
             this.salePrice = salePrice;
             return this;
         }
 
-        public ProductBuilder withOriginPrice(int originPrice){
-            this.originPrice = originPrice;
+        public ProductInfo.ProductBuilder withProductPrice(int originPrice){
+            this.productPrice = originPrice;
             return this;
         }
 
-        public ProductBuilder withProductName(String productName){
+        public ProductInfo.ProductBuilder withProductName(String productName){
             this.productName = productName;
             return this;
         }
 
-        public ProductBuilder withProductType(String productType){
+        public ProductInfo.ProductBuilder withProductType(String productType){
             this.productType = productType;
             return this;
         }
 
-        public ProductBuilder withCategory(Long category){
+        public ProductInfo.ProductBuilder withCategory(Long category){
             this.category = category;
             return this;
         }
 
-        public ProductBuilder withEventNum(Long eventNum){
+        public ProductInfo.ProductBuilder withEventNum(Long eventNum){
             this.eventNum = eventNum;
             return this;
         }
 
 
-        public Product build() {
-            Product product = new Product();
-            product.salePrice = this.salePrice;
-            product.originPrice = this.originPrice;
-            product.productName = this.productName;
-            product.productType = this.productType;
-            product.category = this.category;
-            product.eventNum = this.eventNum;
-            return product;
+        public ProductInfo build() {
+            ProductInfo productInfo = new ProductInfo();
+            productInfo.salePrice = this.salePrice;
+            productInfo.originPrice = this.productPrice;
+            productInfo.productName = this.productName;
+            productInfo.productType = this.productType;
+            productInfo.category = this.category;
+            productInfo.eventNum = this.eventNum;
+            return productInfo;
         }
     }
 }

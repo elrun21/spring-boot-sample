@@ -53,17 +53,6 @@ public class AuthService {
         }
     }
 
-    /**
-     * 이메일 로그인
-     * @param data
-     * @return
-     */
-    @Transactional
-    public ResponseEntity emailSignIn(ReqSignInEmailDTO data) {
-        // id, pw  확인
-        Member user = repositoryMember.findByEmailAndPassword(data.getEmail(), data.getPassword());
-        return commonSignIn(user);
-    }
 
     /**
      * 로그인 로직 ( 공용 )

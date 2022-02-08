@@ -25,19 +25,19 @@ public class ProductController {
     @ApiOperation(value = "상품 조회", response = CommonResponseDTO.class)
     @GetMapping
     public ResponseEntity getProduct(
-            @ApiParam(value = "[next 일 경우] 마지막 상품ID 값", required = true)
-            @RequestParam("lastIdx") Long lastIdx,
-            @ApiParam(value = "[prev 일 경우] 처음 상품ID 값", required = true)
-            @RequestParam("prevIdx") Long prevIdx,
+            @ApiParam(value = "검색기준 상품ID 값", required = false)
+            @RequestParam(required = false) Long targetIdx,
+            @ApiParam(value = "검색기준 상품 명", required = false)
+            @RequestParam(required = false) String name,
             @ApiParam(value = "한페이지 사이즈 값 ( 0 은 불가능 ) ", required = true)
-            @RequestParam("size") int size) {
-        return service.findProduct(lastIdx, prevIdx, size);
+            @RequestParam(required = true) int size) {
+        return service.findProduct(targetIdx, name ,size);
     }
 
 
     @ApiOperation(value = "상품 생성", response = CommonResponseDTO.class)
     @PostMapping
-    public ResponseEntity setProduct( @Valid @RequestBody ReqSetProductDTO data) {
+    public ResponseEntity makeProduct( @Valid @RequestBody ReqSetProductDTO data) {
         return service.setProduct(data);
     }
 }

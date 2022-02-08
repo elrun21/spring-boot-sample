@@ -16,50 +16,40 @@ import javax.validation.Valid;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value="/api/member")
+@RequestMapping(value="/api/member/")
 @Api(tags= {"회원 API"})
 public class MemeberController {
     private final MemberService service;
 
     @ApiOperation(value = "회원 가입" , response = CommonResponseDTO.class)
-    @PostMapping("/sign-up")
+    @PostMapping("sign-up")
     public ResponseEntity signUp(  @Valid @RequestBody ReqSignUpMembeDTO data ) throws Exception {
         return  service.signUp(data);
     }
 
     @ApiOperation(value = "회원 탈퇴" , response = CommonResponseDTO.class)
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{idx}")
     public ResponseEntity deleteUser(
             @ApiParam(value = "(Header)로그인시 받은 토큰", required = true)
             @RequestHeader(value = "token") String token,
-            @PathVariable String id
+            @PathVariable String idx
     ) {
-         return  service.deleteUser(token , id );
+         return  service.deleteUser(token , idx );
     }
 
-    @ApiOperation(value = "단일 회원 조회" , response = CommonResponseDTO.class)
-    @GetMapping("/user/{idx}")
+    @ApiOperation(value = "회원 정보 조회" , response = CommonResponseDTO.class)
+    @GetMapping("{idx}")
     public ResponseEntity getUser(
         @ApiParam(value = "검색할 user idx 값" , required = true)
-        @PathVariable Long idx
+        @PathVariable("idx") String idx
     ) {
+
         return  service.findUserOne(idx);
     }
 
-    @ApiOperation(value = "회원 조회" , response = CommonResponseDTO.class)
-    @GetMapping("/user")
-    public ResponseEntity getUsers(
-            @ApiParam(value = "마지막 user Idx 값 , 이전 페이지 경우 마지막 idx + size*2 값으로 호출" , required = true)
-            @RequestParam("lastIdx") Long lastIdx,
-            @ApiParam(value = "마지막 user Idx 값 , 이전 페이지 경우 마지막 idx + size*2 값으로 호출" , required = true)
-            @RequestParam("prevIdx") Long prevIdx,
-            @ApiParam(value = "한페이지 사이즈 값 ( 0 은 불가능 ) ", required = true)
-            @RequestParam("size") int size  ) {
-        return  service.findUsers(lastIdx ,prevIdx ,size );
-    }
 
     @ApiOperation(value = "회원 정보 수정" , response = CommonResponseDTO.class)
-    @PatchMapping
+    @PatchMapping("{idx}")
     public ResponseEntity updateMember(
             @ApiParam(value = "(Header)로그인시 받은 토큰", required = true)
             @RequestHeader(value = "token") String token,

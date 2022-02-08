@@ -26,12 +26,6 @@ public class AuthController {
         return  service.signIn(data);
     }
 
-    @ApiOperation(value = "이메일 로그인" , response = CommonResponseDTO.class)
-    @PostMapping("/sign-in/email")
-    public ResponseEntity signIn(@Valid  @RequestBody ReqSignInEmailDTO data ) {
-        return  service.emailSignIn(data);
-    }
-
     @ApiOperation(value = "로그아웃" , response = CommonResponseDTO.class)
     @PostMapping("/sign-out")
     public ResponseEntity signOut(

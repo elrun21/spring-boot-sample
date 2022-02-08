@@ -1,11 +1,14 @@
 package com.example.sample.common.utils;
 
 
+import org.springframework.boot.context.properties.ConstructorBinding;
+import org.springframework.stereotype.Component;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
-
+@Component
 public class SecurityUtils {
     public static String alg = "AES/CBC/PKCS5Padding";
     private static final String key = "01234567890123456789012345678901";

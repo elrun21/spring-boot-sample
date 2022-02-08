@@ -2,6 +2,7 @@ package com.example.sample.service;
 
 import com.example.sample.common.dto.TokenDTO;
 import com.example.sample.common.enums.MemberEnum;
+import com.example.sample.common.enums.ResponseCodeEnum;
 import com.example.sample.common.exceptions.TokenValidationCustomException;
 import com.example.sample.common.exceptions.TokenValidationIdException;
 import com.example.sample.common.utils.JwtUtils;
@@ -12,6 +13,7 @@ import com.example.sample.domain.dto.request.ReqMemberModifyDTO;
 import com.example.sample.domain.dto.response.ResMemberInfoDTO;
 import com.example.sample.domain.dto.response.ResMemberInfosDTO;
 import com.example.sample.domain.dto.request.ReqSignUpMembeDTO;
+import com.example.sample.domain.dto.response.ResSignUpDTO;
 import com.example.sample.domain.entity.Member;
 import com.example.sample.domain.entity.MemberInfo;
 import com.example.sample.repository.AuthRepository;
@@ -44,10 +46,11 @@ public class MemberService {
 
     /**
      * 한 사용자만 조회
-     * @param idx
+     * @param strIdx
      * @return
      */
-    public ResponseEntity findUserOne(Long idx ) {
+    public ResponseEntity findUserOne(String strIdx ) {
+        Long idx = Long.parseLong(strIdx);
         // 사용자 정보 조회
         MemberInfo memberInfo = repositoryMemberInfo.findMemberInfoByMemberIdx(
                 Member.MemberBuilder.aMember().withIdx(idx).build()
@@ -68,23 +71,6 @@ public class MemberService {
     }
 
     /**
-     * 유저 리스트 조회 ( cursor 페이징 )
-     * @param lastIdx
-     * @param prevIdx
-     * @param limit
-     * @return
-     */
-    public ResponseEntity findUsers( Long lastIdx , Long prevIdx, int limit ) {
-        if( limit == 0 ) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
-        if( lastIdx != 0 && prevIdx !=0 ) response.makeOtherResponse(HttpStatus.BAD_REQUEST);
-        if ( lastIdx !=0 ){
-            return response.makeSuccessResponse( repositoryMemberInfo.findAllMembers( lastIdx , true , limit ) );
-        }else{
-            return response.makeSuccessResponse( repositoryMemberInfo.findAllMembers( prevIdx , false , limit ) );
-        }
-    }
-
-    /**
      * 회원 가입 처리
      * @param data
      * @return
@@ -94,6 +80,10 @@ public class MemberService {
     @Transactional
     public ResponseEntity signUp(ReqSignUpMembeDTO data) throws Exception{
         try {
+
+            int emailCheck = repositoryMember.countByEmail(data.getEmail());
+            if ( emailCheck > 0 )  return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_NOT_USED_EMAIL.getDesc(), ResponseCodeEnum.MEMBER_NOT_USED_EMAIL.getCode());
+
             /**
              * 기본 회원 테이블 저장
              */
@@ -110,7 +100,7 @@ public class MemberService {
             /**
              * 기본회원테이블 데이터 키를 기준으로 상세 내용 저장
              */
-            if (newMember == null)  return response.makeOtherResponse(HttpStatus.BAD_REQUEST, "member is not create", 201);
+            if (newMember == null)  return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_NOT_CREATE.getDesc(), ResponseCodeEnum.MEMBER_NOT_CREATE.getCode());
             MemberInfo newMemberInfo = repositoryMemberInfo.save(MemberInfo.MemberInfoBuilder.aMemberInfo()
                     .withMemberIdx(newMember)
                     .withUserAddr(data.getAddr())
@@ -118,8 +108,9 @@ public class MemberService {
                     .withUserPhone(data.getPhone())
                     .build()
             );
-            if (newMemberInfo == null) return response.makeOtherResponse(HttpStatus.BAD_REQUEST, "member info is not create", 202);
-            return response.makeSuccessResponse(HttpStatus.NO_CONTENT);
+            if (newMemberInfo == null) return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_INFO_NOT_CREATE.getDesc(), ResponseCodeEnum.MEMBER_INFO_NOT_CREATE.getCode());
+
+            return response.makeSuccessResponse(ResSignUpDTO.builder().userIdx(newMember.getIdx()).build());
         }catch (Exception e){
             log.error(logUtils.getErrorLog(e));
             // Rollback 위한 RuntimeException 발생
