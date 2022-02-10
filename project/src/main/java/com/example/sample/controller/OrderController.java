@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.websocket.server.PathParam;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -44,6 +45,17 @@ public class OrderController {
             @ApiParam(value = "한페이지 사이즈 값 ( 0 은 불가능 ) ", required = true)
             @RequestParam(required = true) int size) {
         return service.findOrder( token,targetIdx, name , size);
+    }
+
+    @ApiOperation(value = "주문 상품 내역 조회" , response = CommonResponseDTO.class)
+    @GetMapping("/{orderIdx}")
+    public ResponseEntity getOrder(
+            @ApiParam(value = "(Header)로그인시 받은 토큰", required = true)
+            @RequestHeader(value = "token") String token,
+            @ApiParam(value = "", required = true)
+            @PathVariable("orderIdx") Long orderIdx
+            ) {
+        return service.findOrderProductDetail( token, orderIdx);
     }
 
 }

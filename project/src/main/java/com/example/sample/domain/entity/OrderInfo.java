@@ -32,7 +32,7 @@ public class OrderInfo extends BaseTime {
     @Column
     private String productName;
 
-    @ApiModelProperty("주문수량")
+    @ApiModelProperty("상품 수")
     @Column
     private int productCount;
 
@@ -61,10 +61,7 @@ public class OrderInfo extends BaseTime {
     @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Member userIdx;
 
-    @ApiModelProperty("(FK) 상품 테이블 키")
-    @JoinColumn(name="product_idx")
-    @ManyToOne( targetEntity = ProductInfo.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private ProductInfo productIdx;
+
 
     public static final class OrderBuilder {
         private String orderNo;
@@ -77,7 +74,7 @@ public class OrderInfo extends BaseTime {
         private String paymentType;
         private int paymentPrice;
         private Member userIdx;
-        private ProductInfo productIdx;
+
 
         private OrderBuilder() {
         }
@@ -104,6 +101,8 @@ public class OrderInfo extends BaseTime {
             this.productCount = productCount;
             return this;
         }
+
+
         public OrderInfo.OrderBuilder withAddr(String addr) {
             this.addr = addr;
             return this;
@@ -133,23 +132,20 @@ public class OrderInfo extends BaseTime {
             return this;
         }
 
-        public OrderInfo.OrderBuilder withProductIdx(ProductInfo productIdx) {
-            this.productIdx = productIdx;
-            return this;
-        }
+
         public OrderInfo build() {
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.orderNo = this.orderNo;
             orderInfo.userId= this.userId;
             orderInfo.productName= this.productName;
-            orderInfo.productCount= this.productCount;
+            orderInfo.productCount = this.productCount;
             orderInfo.addr = this.addr;
             orderInfo.receiver= this.receiver;
             orderInfo.phone= this.phone;
             orderInfo.paymentType= this.paymentType;
             orderInfo.paymentPrice= this.paymentPrice;
             orderInfo.userIdx= this.userIdx;
-            orderInfo.productIdx= this.productIdx;
+
             return orderInfo;
         }
     }

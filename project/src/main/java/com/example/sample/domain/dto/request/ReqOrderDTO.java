@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @ApiModel(value = "회원 상세 정보(단건)")
 @Data
@@ -15,12 +16,8 @@ public class ReqOrderDTO {
     private Long userIdx;
 
     @NotNull
-    @ApiModelProperty(value = "상품정보키"   , required = true)
-    private Long productIdx;
-
-    @NotNull
-    @ApiModelProperty(value = "구매수량"   , required = true)
-    private int productCount;
+    @ApiModelProperty(value = "상품정보"   , required = true)
+    private List<SaleProductInfo> productInfo;
 
     @NotBlank
     @ApiModelProperty(value = "배송지"   , required = true)
@@ -36,5 +33,7 @@ public class ReqOrderDTO {
     @NotBlank
     @ApiModelProperty(value = "결제수단"   , required = true)
     private String paymentType;
+
+   
 
 }
