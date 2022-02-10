@@ -2,29 +2,38 @@ package com.example.sample.domain.dto.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
+import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @ApiModel(value = "회원 상세 정보(단건)")
-@Getter
+@Data
 public class ReqOrderDTO {
     @NotNull
     @ApiModelProperty(value = "사용자 식별키 "   , required = true)
     private Long userIdx;
+
     @NotNull
     @ApiModelProperty(value = "상품정보키"   , required = true)
     private Long productIdx;
+
+    @NotNull
     @ApiModelProperty(value = "구매수량"   , required = true)
     private int productCount;
 
+    @NotBlank
     @ApiModelProperty(value = "배송지"   , required = true)
     private String address;
+    @NotBlank
     @ApiModelProperty(value = "수령인"   , required = true)
     private String receiver;
+
+    @NotBlank
     @ApiModelProperty(value = "배송 연락처"   , required = true)
     private String phone;
+
+    @NotBlank
     @ApiModelProperty(value = "결제수단"   , required = true)
     private String paymentType;
 

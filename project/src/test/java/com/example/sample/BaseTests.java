@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class BaseTests {
     private  final String DEFAULT_MEMBER_API_URL = "/api/member";
     private final String  DEFAULT_ORDER_API_URL = "/api/order";
+    private final String  DEFAULT_PRODUCT_API_URL = "/api/product";
     @Autowired
     ObjectMapper objectMapper;
 
@@ -56,7 +57,7 @@ public class BaseTests {
                         .content(objectMapper.writeValueAsString(getSignUpSuccessCase()))
                 )
                 .andExpect(status().is2xxSuccessful())
-                .andDo(print())
+                .andDo(result -> {})
                 .andReturn();
         Map makeResult = objectMapper.readValue(make.getResponse().getContentAsString(), HashMap.class);
         Map makeContent = (Map) makeResult.get("content");
@@ -70,7 +71,7 @@ public class BaseTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().is2xxSuccessful())
-                .andDo(print()).andReturn();
+                .andDo(result -> {}).andReturn();
         Map loginResult = objectMapper.readValue(login.getResponse().getContentAsString(), HashMap.class);
         Map content = (Map) loginResult.get("content");
         content.put("userIdx", makeContent.get("userIdx"));
@@ -83,7 +84,7 @@ public class BaseTests {
                         .content(objectMapper.writeValueAsString(getSignUpSuccessCase()))
                 )
                 .andExpect(status().isOk())
-                .andDo(print())
+                .andDo(result -> {})
                 .andReturn();
         Map data = objectMapper.readValue(member.getResponse().getContentAsString(), HashMap.class);
         Map result = (Map) data.get("content");
@@ -95,7 +96,7 @@ public class BaseTests {
     private List<ReqSetProductDTO> getProductList(int count){
         List<ReqSetProductDTO> list = new ArrayList<>();
         String productNamePrefix = "새우깡";
-        for ( int i = 1 ; i < count ; count++){
+        for ( int i = 0 ; i < count ; i++){
             list.add(
                     ReqSetProductDTO.builder()
                             .salePrice(200)
@@ -114,11 +115,10 @@ public class BaseTests {
         List<ReqSetProductDTO> list = getProductList(count);
         List<Long> products = new ArrayList<>();
         for( ReqSetProductDTO temp : list){
-            MvcResult product = mockMvc.perform(post(DEFAULT_ORDER_API_URL)
+            MvcResult product = mockMvc.perform(post(DEFAULT_PRODUCT_API_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(temp)))
-                    .andExpect(status().is2xxSuccessful())
-                    .andDo(print()).andReturn();
+                    .andDo(result -> {}).andReturn();
             Map result = objectMapper.readValue(product.getResponse().getContentAsString(), HashMap.class);
             Map content = (Map) result.get("content");
             products.add( Long.parseLong(String.valueOf(content.get("productIdx")) ) );

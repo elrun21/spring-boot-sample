@@ -23,6 +23,7 @@ public class OrderCustomRepositoryImpl implements OrderCustomRepository {
         return queryFactory.select(
                         Projections.constructor(
                                 ResOrderDTO.class,
+                                orderInfo.idx.as("orderIdx"),
                                 orderInfo.orderNo.as("orderNumber"),
                                 orderInfo.productName.as("productName"),
                                 orderInfo.paymentPrice.as("totalPrice"),

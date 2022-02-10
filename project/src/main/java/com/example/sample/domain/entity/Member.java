@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 
 @Table(name = "MEMBER")
@@ -25,6 +26,7 @@ public class Member extends BaseTime{
     @Column(unique = true)
     private String id ;
 
+    @Email
     @ApiModelProperty("사용자 이메일")
     @Column(unique = true)
     private String email ;

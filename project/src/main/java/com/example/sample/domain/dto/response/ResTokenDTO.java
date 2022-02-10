@@ -10,6 +10,4 @@ import lombok.Data;
 public class ResTokenDTO {
     @ApiModelProperty(value = "토큰")
     private String token;
-
-
 }

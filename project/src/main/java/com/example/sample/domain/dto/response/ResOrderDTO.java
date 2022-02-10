@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 @Builder
 @Data
 public class ResOrderDTO {
+    @ApiModelProperty(value = "주문 식별키")
+    private Long orderIdx;
+
     @ApiModelProperty(value = "주문 번호")
     private String orderNumber;
 
@@ -39,6 +42,7 @@ public class ResOrderDTO {
     private String addr;
 
     public ResOrderDTO(
+       Long orderIdx,
        String orderNumber,
        String productName,
        int totalPrice,
@@ -49,6 +53,7 @@ public class ResOrderDTO {
        String receiver,
        String addr
     ) {
+        this.orderIdx = orderIdx;
         this.orderNumber = orderNumber;
         this.productName = productName;
         this.totalPrice = totalPrice;

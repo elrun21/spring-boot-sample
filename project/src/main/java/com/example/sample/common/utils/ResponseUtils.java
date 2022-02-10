@@ -1,6 +1,6 @@
 package com.example.sample.common.utils;
 
-import com.example.sample.common.CommonEnum;
+import com.example.sample.common.enums.CommonEnum;
 import com.example.sample.common.dto.CommonResponseDTO;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

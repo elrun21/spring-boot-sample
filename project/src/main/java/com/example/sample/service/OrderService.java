@@ -1,12 +1,12 @@
 package com.example.sample.service;
 
+import com.example.sample.common.enums.ResponseCodeEnum;
 import com.example.sample.common.utils.CodeGenerator;
 import com.example.sample.common.utils.JwtUtils;
 import com.example.sample.common.utils.LogUtils;
 import com.example.sample.common.utils.ResponseUtils;
 import com.example.sample.domain.dto.request.ReqOrderDTO;
 import com.example.sample.domain.dto.response.ResOrderDTO;
-import com.example.sample.domain.dto.response.ResOrderDetailDTO;
 import com.example.sample.domain.entity.Member;
 import com.example.sample.domain.entity.OrderInfo;
 import com.example.sample.domain.entity.ProductInfo;
@@ -37,6 +37,13 @@ public class OrderService {
     @Transactional
     public ResponseEntity makeOrder(ReqOrderDTO data) {
         try {
+            if(  data.getProductCount() <= 0 ) {
+                return response.makeOtherResponse(
+                            HttpStatus.BAD_REQUEST,
+                            ResponseCodeEnum.ORDER_NOT_CREATE_PRODUCT_CNT.getDesc(),
+                            ResponseCodeEnum.ORDER_NOT_CREATE_PRODUCT_CNT.getCode()
+                        );
+            }
             String orderNumber = generator.makeCode("OR");
             Member member = memberRepository.findByIdx(data.getUserIdx());
             ProductInfo product = productRepository.findByIdx(data.getProductIdx());
@@ -57,6 +64,7 @@ public class OrderService {
             );
             return response.makeSuccessResponse(
                     ResOrderDTO.builder()
+                            .orderIdx(order.getIdx())
                             .orderNumber(orderNumber)
                             .productName(product.getProductName())
                             .totalPrice(product.getSalePrice() * data.getProductCount())

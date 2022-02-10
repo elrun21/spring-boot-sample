@@ -7,9 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
+
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
@@ -17,29 +16,31 @@ import javax.validation.constraints.Size;
 @Data
 public class ReqSetProductDTO {
     @NotNull
+    @Min(value = 1)
     @ApiModelProperty(value = "판매금액 ", required = true)
     private int salePrice;
 
     @NotNull
+    @Min(value = 1)
     @ApiModelProperty(value = "공장생산가격 ", required = true)
     private int productPrice;
 
     @NotBlank
-    @Size(max = 50)
     @ApiModelProperty(value = "상품명 ", required = true)
     private String productName;
 
     @NotBlank
-    @Size(max = 4)
     @ApiModelProperty(value = "상품분류(NR : 일반 , EV : 이벤트 )", required = true)
     private String productType;
 
     @NotNull
+    @Min(value = 1)
     @ApiModelProperty(value = "상품 분류키", required = true)
     private Long category;
 
 
     @NotNull
+    @Min(value = 1)
     @ApiModelProperty(value = "이벤트 키", required = true)
     private Long eventNum;
 
