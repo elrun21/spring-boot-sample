@@ -11,4 +11,5 @@ public class TokenDTO {
     private HttpStatus status ;
     private String msg;
     private Claims data;
+    private int errCode ;
 }

@@ -12,7 +12,6 @@ import javax.persistence.*;
 @Table(name = "PRODUCT_INFO")
 @Entity
 @Getter
-@Setter
 @DynamicUpdate
 @NoArgsConstructor
 public class ProductInfo extends BaseTime{

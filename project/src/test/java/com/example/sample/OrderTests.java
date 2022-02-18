@@ -19,10 +19,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Transactional
 public class OrderTests extends BaseTests {
-    private final String DEFAULT_API_URL = "/api/order";
+    private static final  String DEFAULT_API_URL = "/api/order";
 
+    /**
+     * 주문등록_성공_테스트
+     * @throws Exception
+     */
     @Test
-    public void 주문등록_성공_테스트() throws Exception {
+    public void orderSuccess() throws Exception {
         // Given
         List<Long> products = makeProduct(1);
         Long userIdx = Long.parseLong(String.valueOf(getLoginInfo().get("userIdx")));
@@ -51,8 +55,12 @@ public class OrderTests extends BaseTests {
 
     }
 
+    /**
+     * 주문등록_실패_테스트_주소없을경우
+     * @throws Exception
+     */
     @Test
-    public void 주문등록_실패_테스트_주소없을경우() throws Exception {
+    public void orderFailCase01() throws Exception {
         // Given
         List<Long> products = makeProduct(1);
         Long userIdx = Long.parseLong(String.valueOf(getLoginInfo().get("userIdx")));
@@ -80,8 +88,12 @@ public class OrderTests extends BaseTests {
 
     }
 
+    /**
+     * 주문등록_실패_테스트_전화번호없을경우
+     * @throws Exception
+     */
     @Test
-    public void 주문등록_실패_테스트_전화번호없을경우() throws Exception {
+    public void orderFailCase02() throws Exception {
         // Given
         List<Long> products = makeProduct(1);
         Long userIdx = Long.parseLong(String.valueOf(getLoginInfo().get("userIdx")));
@@ -109,8 +121,12 @@ public class OrderTests extends BaseTests {
 
     }
 
+    /**
+     * 주문등록_실패_테스트_결제수단없을경우
+     * @throws Exception
+     */
     @Test
-    public void 주문등록_실패_테스트_결제수단없을경우() throws Exception {
+    public void orderFailCase03() throws Exception {
         // Given
         List<Long> products = makeProduct(1);
         Long userIdx = Long.parseLong(String.valueOf(getLoginInfo().get("userIdx")));
@@ -137,8 +153,12 @@ public class OrderTests extends BaseTests {
 
     }
 
+    /**
+     * 주문등록_실패_테스트_구매수량없을경우
+     * @throws Exception
+     */
     @Test
-    public void 주문등록_실패_테스트_구매수량없을경우() throws Exception {
+    public void orderFailCase04() throws Exception {
         // Given
         List<Long> products = makeProduct(1);
         Long userIdx = Long.parseLong(String.valueOf(getLoginInfo().get("userIdx")));
@@ -166,8 +186,12 @@ public class OrderTests extends BaseTests {
 
     }
 
+    /**
+     * 주문등록_실패_테스트_존재하지않는상품주문
+     * @throws Exception
+     */
     @Test
-    public void 주문등록_실패_테스트_존재하지않는상품주문() throws Exception {
+    public void orderFailCase05() throws Exception {
 
         // Given
         SaleProductInfo saleProductInfo = new SaleProductInfo();
@@ -192,8 +216,12 @@ public class OrderTests extends BaseTests {
                 .andDo(print());
     }
 
+    /**
+     * 주문등록_실패_테스트_존재하지않는사용자
+     * @throws Exception
+     */
     @Test
-    public void 주문등록_실패_테스트_존재하지않는사용자() throws Exception {
+    public void orderFailCase06() throws Exception {
 
         // Given
         List<Long> products = makeProduct(1);
@@ -220,9 +248,12 @@ public class OrderTests extends BaseTests {
                 .andDo(print());
     }
 
-
+    /**
+     * 주문내역조회_성공_테스트_최초조회
+     * @throws Exception
+     */
     @Test
-    public void 주문내역조회_성공_테스트_최초조회() throws Exception {
+    public void orderSearchSuccess01() throws Exception {
 
         // Given
         List<Long> products = makeProduct(1);
@@ -262,8 +293,12 @@ public class OrderTests extends BaseTests {
 
     }
 
+    /**
+     * 주문내역조회_성공_테스트_IDX_선택
+     * @throws Exception
+     */
     @Test
-    public void 주문내역조회_성공_테스트_IDX_선택() throws Exception {
+    public void orderSearchSuccess02() throws Exception {
 
         // Given
         List<Long> products = makeProduct(1);
@@ -310,9 +345,12 @@ public class OrderTests extends BaseTests {
 
     }
 
-
+    /**
+     * 주문내역조회_실패_테스트_토큰이없을때
+     * @throws Exception
+     */
     @Test
-    public void 주문내역조회_실패_테스트_토큰이없을때() throws Exception {
+    public void orderSearchFail01() throws Exception {
 
         // Given
         List<Long> products = makeProduct(1);
@@ -357,8 +395,12 @@ public class OrderTests extends BaseTests {
 
     }
 
+    /**
+     * 주문_상품_내역조회_성공_테스트_
+     * @throws Exception
+     */
     @Test
-    public void 주문_상품_내역조회_성공_테스트_() throws Exception {
+    public void orderSearchDetailSuccess() throws Exception {
 
         // Given
         List<Long> products = makeProduct(1);

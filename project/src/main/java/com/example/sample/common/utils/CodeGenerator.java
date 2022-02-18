@@ -13,8 +13,10 @@ public class CodeGenerator {
      * @return
      */
     public String  makeCode( String prefix ){
+        if( prefix == null ) throw new IllegalArgumentException("prefix is not null");
         if(prefix.length() > 2)
            throw new IllegalArgumentException("code의 자리수는 2를 초과할 수 없습니다");
+
         LocalDateTime dateTime = LocalDateTime.now();
         String currentTime = String.valueOf(Timestamp.valueOf(dateTime).getTime()).substring(1,10) ;
         String lastCode = RandomStringUtils.randomAlphanumeric(2);

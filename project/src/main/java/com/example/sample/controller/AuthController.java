@@ -2,7 +2,6 @@ package com.example.sample.controller;
 
 import com.example.sample.common.dto.CommonResponseDTO;
 import com.example.sample.domain.dto.request.ReqSignInDTO;
-import com.example.sample.domain.dto.request.ReqSignInEmailDTO;
 import com.example.sample.service.AuthService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,7 +26,7 @@ public class AuthController {
     }
 
     @ApiOperation(value = "로그아웃" , response = CommonResponseDTO.class)
-    @PostMapping("/sign-out")
+    @PostMapping("/sign-out" )
     public ResponseEntity signOut(
             @Valid
             @ApiParam(value = "(Header)로그인시 받은 토큰", required = true)

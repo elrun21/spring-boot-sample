@@ -22,6 +22,7 @@ public class ReqOrderDTO {
     @NotBlank
     @ApiModelProperty(value = "배송지"   , required = true)
     private String address;
+
     @NotBlank
     @ApiModelProperty(value = "수령인"   , required = true)
     private String receiver;

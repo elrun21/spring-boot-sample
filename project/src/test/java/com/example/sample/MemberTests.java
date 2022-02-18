@@ -18,10 +18,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Transactional
 class MemberTests extends BaseTests{
-    private final String  DEFAULT_API_URL = "/api/member";
+    private static final  String  DEFAULT_API_URL = "/api/member";
 
+    /**
+     * 회원_가입_성공_테스트
+     * @throws Exception
+     */
     @Test
-    public  void 회원_가입_성공_테스트() throws Exception {
+    public  void memberSigUp() throws Exception {
 
         MvcResult member= mockMvc.perform(post(DEFAULT_API_URL+"/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -32,8 +36,12 @@ class MemberTests extends BaseTests{
                 .andReturn();
     }
 
+    /**
+     * 회원_가입_실패_긴아이디
+     * @throws Exception
+     */
     @Test
-    public  void 회원_가입_실패_긴아이디() throws Exception {
+    public  void memberSignUpFail01 () throws Exception {
         // Given
         ReqSignUpMembeDTO request = new ReqSignUpMembeDTO();
         request.setAddr("테스트 주소입니다");
@@ -51,8 +59,13 @@ class MemberTests extends BaseTests{
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
+    /**
+     * 회원_가입_실패_아이디가없는경우
+     * @throws Exception
+     */
     @Test
-    public  void 회원_가입_실패_아이디가없는경우() throws Exception {
+    public  void memberSignUpFail02() throws Exception {
         // Given
         /** 아이디 정보가 없을 경우 **/
         // Given
@@ -71,8 +84,13 @@ class MemberTests extends BaseTests{
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
+    /**
+     * 회원_가입_실패_비밀번호가없음
+     * @throws Exception
+     */
     @Test
-    public  void 회원_가입_실패_비밀번호가없음() throws Exception {
+    public  void memberSignUpFail03() throws Exception {
         // Given
         /** 패스워드 정보가 없을 경우 **/
         ReqSignUpMembeDTO request = new ReqSignUpMembeDTO();
@@ -91,8 +109,13 @@ class MemberTests extends BaseTests{
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
+    /**
+     * 회원_탈퇴_성공
+     * @throws Exception
+     */
     @Test
-    public void 회원_탈퇴_성공() throws Exception{
+    public void memberSignUpFail04() throws Exception{
         String token = (String) getLoginInfo().get("token");
         // When, Then
         mockMvc.perform(delete(DEFAULT_API_URL+"/"+getSignUpSuccessCase().getId())
@@ -104,9 +127,12 @@ class MemberTests extends BaseTests{
     }
 
 
-
+    /**
+     * 회원_탈퇴_실패
+     * @throws Exception
+     */
     @Test
-    public void 회원_탈퇴_실패() throws Exception{
+    public void memberSignOut() throws Exception{
         Map loginInfo = getLoginInfo();
         String token = (String) loginInfo.get("token");
         String userIdx = String.valueOf(loginInfo.get("userIdx"));
@@ -139,8 +165,12 @@ class MemberTests extends BaseTests{
                 .andDo(print());
     }
 
+    /**
+     * 회원_정보조회_성공
+     * @throws Exception
+     */
     @Test
-    public void 회원_정보조회_성공() throws Exception{
+    public void memberSearchSuccess() throws Exception{
         Map loginInfo = getLoginInfo();
         String token = (String) loginInfo.get("token");
         String userIdx = String.valueOf(loginInfo.get("userIdx"));
@@ -153,8 +183,13 @@ class MemberTests extends BaseTests{
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print());
     }
+
+    /**
+     * 회원_정보조회_실패_잘못된유저정보
+     * @throws Exception
+     */
     @Test
-    public void 회원_정보조회_실패_잘못된유저정보() throws Exception{
+    public void memberSearchFailCase01() throws Exception{
 
         /** 잘못된 파라미터 입력 **/
         String erroUrl01 = DEFAULT_API_URL+"/user/asdf";
@@ -165,9 +200,12 @@ class MemberTests extends BaseTests{
     }
 
 
-
+    /**
+     * 회원_정보수정_성공
+     * @throws Exception
+     */
     @Test
-    public void 회원_정보수정_성공() throws Exception{
+    public void memberModifySuccess() throws Exception{
         Map loginInfo = getLoginInfo();
         String token = (String) loginInfo.get("token");
         String userIdx = String.valueOf(loginInfo.get("userIdx"));
@@ -186,9 +224,12 @@ class MemberTests extends BaseTests{
                 .andDo(print());
     }
 
-
+    /**
+     * 회원_정보수정_실패_모든값이없을경우
+     * @throws Exception
+     */
     @Test
-    public void 회원_정보수정_실패_모든값이없을경우() throws Exception {
+    public void memberModifyFail01() throws Exception {
         Map loginInfo = getLoginInfo();
         String token = (String) loginInfo.get("token");
         String userIdx = String.valueOf(loginInfo.get("userIdx"));
@@ -207,8 +248,12 @@ class MemberTests extends BaseTests{
                 .andDo(print());
     }
 
+    /**
+     * 회원_정보수정_실패_주소_핸드폰_정보없음
+     * @throws Exception
+     */
     @Test
-    public void 회원_정보수정_실패_주소_핸드폰_정보없음() throws Exception {
+    public void memberModifyFail02() throws Exception {
         //given
         Map loginInfo = getLoginInfo();
         String token = (String) loginInfo.get("token");
@@ -227,8 +272,13 @@ class MemberTests extends BaseTests{
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
+    /**
+     * 회원_정보수정_실패_핸드폰정보가_길때
+     * @throws Exception
+     */
     @Test
-    public void 회원_정보수정_실패_핸드폰정보가_길때() throws Exception {
+    public void memberModifyFail03() throws Exception {
         //given
         Map loginInfo = getLoginInfo();
         String token = (String) loginInfo.get("token");
@@ -247,8 +297,12 @@ class MemberTests extends BaseTests{
                 .andDo(print());
     }
 
+    /**
+     * 회원_정보수정_실패_토큰이없을때
+     * @throws Exception
+     */
     @Test
-    public void 회원_정보수정_실패_토큰이없을때() throws Exception {
+    public void memberModifyFail04() throws Exception {
         //given
         Map loginInfo = getLoginInfo();
         String userIdx = String.valueOf(loginInfo.get("userIdx"));

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -38,7 +39,7 @@ public class OrderService {
     private final ResponseUtils response;
     private final LogUtils logUtils;
     private final CodeGenerator generator;
-    private final JwtUtils jwt ;
+    private final JwtUtils jwt;
 
     @Transactional
     public ResponseEntity makeOrder(ReqOrderDTO data) {
@@ -49,7 +50,7 @@ public class OrderService {
             List<SaleProductInfo> list = data.getProductInfo();
 
             int totalPrice = 0;
-            int productStrCnt = list.size()-1;
+            int productStrCnt = list.size() - 1;
             String productName = "";
             OrderInfo order = orderRepository.save(
                     OrderInfo.OrderBuilder.aProduct()
@@ -65,10 +66,10 @@ public class OrderService {
                             .build()
             );
 
-            for ( SaleProductInfo info : list) {
+            for (SaleProductInfo info : list) {
                 long idx = info.getProductIdx();
                 int cnt = info.getProductCount();
-                if ( idx == 0 ||  cnt <= 0 ){
+                if (idx == 0 || cnt <= 0) {
                     return response.makeOtherResponse(
                             HttpStatus.BAD_REQUEST
                             , ResponseCodeEnum.ORDER_NOT_CREATE_PRODUCT.getDesc()
@@ -76,7 +77,7 @@ public class OrderService {
                     );
                 }
                 ProductInfo product = productRepository.findByIdx(idx);
-                if( product == null ) {
+                if (product == null) {
                     return response.makeOtherResponse(
                             HttpStatus.BAD_REQUEST
                             , ResponseCodeEnum.ORDER_NOT_CREATE_PRODUCT_IDX.getDesc()
@@ -85,12 +86,12 @@ public class OrderService {
                 }
 
 
-                if( productName.equals("")) {
-                    productName = product.getProductName()+" 외 "+productStrCnt+"건";
+                if (productName.equals("")) {
+                    productName = product.getProductName() + " 외 " + productStrCnt + "건";
                 }
-                int sumPrice = product.getSalePrice()*cnt;
+                int sumPrice = product.getSalePrice() * cnt;
                 totalPrice += sumPrice;
-                orderProductRepository.save( OrderProduct.OrderProductBuilder.aOrderProduct()
+                orderProductRepository.save(OrderProduct.OrderProductBuilder.aOrderProduct()
                         .withProductCount(cnt)
                         .withProductPrice(product.getOriginPrice())
                         .withSalePrice(product.getSalePrice())
@@ -100,39 +101,37 @@ public class OrderService {
                         .build()
                 );
             }
-            order.setProductName(productName);
-            order.setPaymentPrice(totalPrice);
-            order.setProductCount(list.size());
+            order.updateProductName(productName);
+            order.updatePaymentPrice(totalPrice);
+            order.updateProductCount(list.size());
             orderRepository.save(order);
 
+            ResOrderDTO result = new ResOrderDTO();
+            result.setOrderIdx(order.getIdx());
+            result.setOrderNumber(orderNumber);
+            result.setProductName(productName);
+            result.setTotalPrice(totalPrice);
+            result.setTotalCount(productStrCnt + 1);
+            result.setPaymentType(order.getPaymentType());
+            result.setOrderDate(order.getCreateAt());
+            result.setSender(member.getId());
+            result.setReceiver(order.getReceiver());
+            result.setAddr(order.getAddr());
+            return response.makeSuccessResponse(result);
 
-            return response.makeSuccessResponse(
-                    ResOrderDTO.builder()
-                            .orderIdx(order.getIdx())
-                            .orderNumber(orderNumber)
-                            .productName(productName)
-                            .totalPrice(totalPrice)
-                            .totalCount(productStrCnt+1)
-                            .paymentType(order.getPaymentType())
-                            .orderDate(order.getCreateAt())
-                            .sender(member.getId())
-                            .receiver(order.getReceiver())
-                            .addr(order.getAddr())
-                            .build()
-            );
-        }catch (Exception e ) {
+        } catch (Exception e) {
             e.printStackTrace();
             logUtils.loggerAgent(e);
             throw new RuntimeException("OrderMakeException");
         }
     }
 
-    public ResponseEntity findOrder(String token , Long targetIdx, String productName,int limit) {
+    public ResponseEntity findOrder(String token, Long targetIdx, String productName, int limit) {
         Long userIdx = jwt.getUserIdx(token);
         Member member = memberRepository.findByIdx(userIdx);
-        if( limit == 0 ) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
-        List<ResOrderDTO> result = orderRepository.findOrder( member , targetIdx , productName, limit ) ;
-        return response.makeSuccessResponse( result );
+        if (limit == 0) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+        List<ResOrderDTO> result = orderRepository.findOrder(member, targetIdx, productName, limit);
+        return response.makeSuccessResponse(result);
     }
 
     public ResponseEntity findOrderProductDetail(String token, Long orderIdx) {
@@ -141,26 +140,26 @@ public class OrderService {
             if (userIdx == 0) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
             Member member = memberRepository.findByIdx(userIdx);
             if (member == null) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
-            OrderInfo order = new OrderInfo();
-            order.setIdx(orderIdx);
+            OrderInfo order = orderRepository.findById(orderIdx).get();
+            if (order == null) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
             List<OrderProduct> result = orderProductRepository.findAllByOrderIdx(order);
             List<ResOrderProductDetail> list = new ArrayList<>();
-            for( OrderProduct obj : result){
+            for (OrderProduct obj : result) {
                 list.add(
-                    ResOrderProductDetail.builder()
-                            .productCount(obj.getProductCount())
-                            .productPrice(obj.getProductPrice())
-                            .salePrice(obj.getSalePrice())
-                            .totalPrice(obj.getTotalPrice())
-                            .orderIdx(obj.getOrderIdx().getIdx())
-                            .productIdx(obj.getProductIdx().getIdx())
-                            .createAt(obj.getCreateAt())
-                            .build()
+                        ResOrderProductDetail.builder()
+                                .productCount(obj.getProductCount())
+                                .productPrice(obj.getProductPrice())
+                                .salePrice(obj.getSalePrice())
+                                .totalPrice(obj.getTotalPrice())
+                                .orderIdx(obj.getOrderIdx().getIdx())
+                                .productIdx(obj.getProductIdx().getIdx())
+                                .createAt(obj.getCreateAt())
+                                .build()
                 );
             }
 
             return response.makeSuccessResponse(list);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             logUtils.loggerAgent(e);
             return response.makeOtherResponse(HttpStatus.INTERNAL_SERVER_ERROR);

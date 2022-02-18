@@ -14,11 +14,11 @@ import lombok.ToString;
 @Builder
 public class CommonResponseDTO {
     @ApiModelProperty(value = "처리 결과 메세지")
-    String msg;
+    private String msg;
     @ApiModelProperty(value = "에러 코드 ( 0 이면 정상처리 그외에는 에러코드 ) ")
-    int code ;
+    private int code ;
     @ApiModelProperty(value = "처리 결과 데이터")
-    Object content;
+    private Object content;
     public CommonResponseDTO toEntity() {
         return CommonResponseDTO.builder()
                 .code(code)

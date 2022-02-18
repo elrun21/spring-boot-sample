@@ -35,7 +35,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class MemberService {
-    private final JwtUtils jwt ;
+    private final JwtUtils jwt;
     private final MemberRepository repositoryMember;
     private final MemberInfoRepository repositoryMemberInfo;
     private final AuthRepository repositoryAuth;
@@ -46,50 +46,60 @@ public class MemberService {
 
     /**
      * 한 사용자만 조회
+     *
      * @param strIdx
      * @return
      */
-    public ResponseEntity findUserOne(String strIdx ) {
+    public ResponseEntity findUserOne(String strIdx) {
         Long idx = Long.parseLong(strIdx);
         // 사용자 정보 조회
-        MemberInfo memberInfo = repositoryMemberInfo.findMemberInfoByMemberIdx(
-                Member.MemberBuilder.aMember().withIdx(idx).build()
-        );
-        if( memberInfo == null )  return response.makeOtherResponse(HttpStatus.NO_CONTENT);
-        Member member = memberInfo.getMemberIdx();
-        // 전달할 객체 세팅 후 전달
-        ResMemberInfoDTO result = ResMemberInfoDTO.builder()
-                .userGrade(member.getUserGrade())
-                .userId(member.getId())
-                .userAccountStatus(member.getLiveStatus())
-                .userAddr(memberInfo.getUserAddr())
-                .userName(memberInfo.getUserName())
-                .userPhone(memberInfo.getUserPhone())
-                .userJoinDate(member.getCreateAt())
-                .build();
-        return response.makeSuccessResponse( result);
+        try {
+            MemberInfo memberInfo = repositoryMemberInfo.findMemberInfoByMemberIdx(
+                    Member.MemberBuilder.aMember().withIdx(idx).build()
+            );
+
+            if (memberInfo == null) return response.makeOtherResponse(HttpStatus.NO_CONTENT);
+            Member member = memberInfo.getMemberIdx();
+            // 전달할 객체 세팅 후 전달
+            ResMemberInfoDTO result = ResMemberInfoDTO.builder()
+                    .userGrade(member.getUserGrade())
+                    .userId(member.getId())
+                    .userAccountStatus(member.getLiveStatus())
+                    .userAddr(memberInfo.getUserAddr())
+                    .userName(memberInfo.getUserName())
+                    .userPhone(memberInfo.getUserPhone())
+                    .userJoinDate(member.getCreateAt())
+                    .build();
+
+            return response.makeSuccessResponse(result);
+        } catch (Exception e) {
+            logUtils.getErrorLog(e);
+            return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**
      * 회원 가입 처리
+     *
      * @param data
      * @return
      * @throws Exception
      */
     @Validated
     @Transactional
-    public ResponseEntity signUp(ReqSignUpMembeDTO data) throws Exception{
+    public ResponseEntity signUp(ReqSignUpMembeDTO data) throws Exception {
         try {
 
             int emailCheck = repositoryMember.countByEmail(data.getEmail());
-            if ( emailCheck > 0 )  return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_NOT_USED_EMAIL.getDesc(), ResponseCodeEnum.MEMBER_NOT_USED_EMAIL.getCode());
+            if (emailCheck > 0)
+                return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_NOT_USED_EMAIL.getDesc(), ResponseCodeEnum.MEMBER_NOT_USED_EMAIL.getCode());
 
             /**
              * 기본 회원 테이블 저장
              */
             Member newMember = repositoryMember.save(Member.MemberBuilder.aMember()
                     .withId(data.getId())
-                    .withPassword( security.getAESEncrypt(data.getPassword()) )
+                    .withPassword(security.getAESEncrypt(data.getPassword()))
                     .withLiveStatus("LIVE")
                     .withUserGrade(1)
                     .withEmail(data.getEmail())
@@ -100,7 +110,8 @@ public class MemberService {
             /**
              * 기본회원테이블 데이터 키를 기준으로 상세 내용 저장
              */
-            if (newMember == null)  return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_NOT_CREATE.getDesc(), ResponseCodeEnum.MEMBER_NOT_CREATE.getCode());
+            if (newMember == null)
+                return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_NOT_CREATE.getDesc(), ResponseCodeEnum.MEMBER_NOT_CREATE.getCode());
             MemberInfo newMemberInfo = repositoryMemberInfo.save(MemberInfo.MemberInfoBuilder.aMemberInfo()
                     .withMemberIdx(newMember)
                     .withUserAddr(data.getAddr())
@@ -108,10 +119,11 @@ public class MemberService {
                     .withUserPhone(data.getPhone())
                     .build()
             );
-            if (newMemberInfo == null) return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_INFO_NOT_CREATE.getDesc(), ResponseCodeEnum.MEMBER_INFO_NOT_CREATE.getCode());
+            if (newMemberInfo == null)
+                return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.MEMBER_INFO_NOT_CREATE.getDesc(), ResponseCodeEnum.MEMBER_INFO_NOT_CREATE.getCode());
 
             return response.makeSuccessResponse(ResSignUpDTO.builder().userIdx(newMember.getIdx()).build());
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(logUtils.getErrorLog(e));
             // Rollback 위한 RuntimeException 발생
             throw new RuntimeException("MemberCreateException");
@@ -121,62 +133,77 @@ public class MemberService {
 
     /**
      * 회원 탈퇴
+     *
      * @param token
      * @return
      */
+    @Validated
     @Transactional
-    public ResponseEntity deleteUser( String token , String id ) {
-        // 토큰에서 데이터 추출
-        if( token == null  ) return response.makeOtherResponse(HttpStatus.UNAUTHORIZED);
-        TokenDTO tokenData = jwt.valid(token);
-        if ( tokenData.getStatus() != HttpStatus.OK ){
-            log.error("status : "+tokenData.getStatus());
-            return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+    public ResponseEntity deleteUser(String token, String id) {
+        try {
+            // 토큰에서 데이터 추출
+            if (token == null) return response.makeOtherResponse(HttpStatus.UNAUTHORIZED);
+            TokenDTO tokenData = jwt.valid(token);
+            if (tokenData.getStatus() != HttpStatus.OK) {
+                log.error("status : " + tokenData.getStatus());
+                return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+            }
+            log.debug("token data : " + tokenData.toString());
+            Long idx = getIdx(tokenData.getData(), id);
+            // 탈퇴할 사용자 정보 조회
+            Member member = repositoryMember.findByIdx(idx);
+            if (member == null)
+                // 탈퇴 상태값 변경
+                member.updateLiveStatus(MemberEnum.USER_STATE_DELETE.getCode());
+            member.updateDeleteAt(LocalDateTime.now());
+            return response.makeOtherResponse(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            logUtils.getErrorLog(e);
+            throw new RuntimeException("UserDeleteException");
         }
-        log.debug("token data : "+tokenData.toString());
-        Long idx = getIdx(tokenData.getData(), id );
-        // 탈퇴할 사용자 정보 조회
-        Member member = repositoryMember.findByIdx(idx);
-        if( member == null )
-        // 탈퇴 상태값 변경
-        member.setLiveStatus(MemberEnum.USER_STATE_DELETE.getCode());
-        member.setDeleteAt(LocalDateTime.now());
-        return response.makeOtherResponse(HttpStatus.NO_CONTENT);
     }
 
     /**
      * 회원 상세 정보를 수정 하는 역할
+     *
      * @param data
      * @param token
      * @return
      */
     @Validated
     @Transactional
-    public ResponseEntity updateMemberInfo(ReqMemberModifyDTO data , String token) {
-        if( data.getAddr() == null && data.getPhone() == null ) return  response.makeOtherResponse(HttpStatus.BAD_REQUEST);
-        TokenDTO tokenData = jwt.valid(token);
-        Long idx = getIdx(tokenData.getData(), data.getId());
-        Member member = repositoryMember.findByIdx(idx);
-        MemberInfo info = repositoryMemberInfo.findMemberInfoByMemberIdx(member);
-        if( info.getUserAddr() != null ) info.setUserAddr(data.getAddr());
-        if( info.getUserPhone() !=null ) info.setUserPhone(data.getPhone());
-        return response.makeOtherResponse(HttpStatus.NO_CONTENT);
+    public ResponseEntity updateMemberInfo(ReqMemberModifyDTO data, String token) {
+        if (data.getAddr() == null && data.getPhone() == null)
+            return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+        try {
+            TokenDTO tokenData = jwt.valid(token);
+            Long idx = getIdx(tokenData.getData(), data.getId());
+            Member member = repositoryMember.findByIdx(idx);
+            MemberInfo info = repositoryMemberInfo.findMemberInfoByMemberIdx(member);
+            if (info.getUserAddr() != null) info.setUserAddr(data.getAddr());
+            if (info.getUserPhone() != null) info.setUserPhone(data.getPhone());
+            return response.makeOtherResponse(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            logUtils.getErrorLog(e);
+            throw new RuntimeException("UserModifyException");
+        }
     }
 
     /**
      * 토큰에서 idx 값을 추출 / 토큰 검증 하는 역할
+     *
      * @param token
      * @param id
      * @return
      */
-    private Long getIdx( Claims token , String id ){
+    private Long getIdx(Claims token, String id) {
         String tokenInId = (String) token.get("id");
-        if( tokenInId == null ) {
+        if (tokenInId == null) {
             log.error(token.toString());
-            log.error( "token id is null :"+ tokenInId);
+            log.error("token id is null :" + tokenInId);
             throw new TokenValidationCustomException();
         }
-        if( !id.equals(tokenInId) ) throw new TokenValidationIdException();
-        return Long.parseLong( String.valueOf(token.get("idx")) );
+        if (!id.equals(tokenInId)) throw new TokenValidationIdException();
+        return Long.parseLong(String.valueOf(token.get("idx")));
     }
 }

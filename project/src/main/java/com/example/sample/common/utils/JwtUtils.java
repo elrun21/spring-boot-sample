@@ -2,6 +2,7 @@ package com.example.sample.common.utils;
 
 import com.example.sample.common.config.SecurityProperties;
 import com.example.sample.common.dto.TokenDTO;
+import com.example.sample.common.enums.ResponseCodeEnum;
 import com.example.sample.domain.entity.Member;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -61,32 +62,38 @@ public class JwtUtils {
             return TokenDTO.builder()
                     .data(tokenData)
                     .status(HttpStatus.OK)
+                    .errCode(ResponseCodeEnum.JWT_ERROR_CODE_SIGNATURE.getCode())
                     .msg("success")
                     .build();
         } catch ( SecurityException e) {
             return TokenDTO.builder()
                     .status(HttpStatus.UNAUTHORIZED)
-                    .msg("JWT signature does not match locally computed signature.")
+                    .msg(ResponseCodeEnum.JWT_ERROR_CODE_SIGNATURE_NOT_MATCH.getDesc())
+                    .errCode(ResponseCodeEnum.JWT_ERROR_CODE_SIGNATURE_NOT_MATCH.getCode())
                     .build();
         } catch (MalformedJwtException e ) {
             return TokenDTO.builder()
                     .status(HttpStatus.UNAUTHORIZED)
-                    .msg("Invalid JWT Token")
+                    .msg(ResponseCodeEnum.JWT_ERROR_CODE_INVALID.getDesc())
+                    .errCode(ResponseCodeEnum.JWT_ERROR_CODE_INVALID.getCode())
                     .build();
         } catch (ExpiredJwtException e ) {
             return TokenDTO.builder()
                     .status(HttpStatus.UNAUTHORIZED)
-                    .msg("Expired JWT Token")
+                    .msg(ResponseCodeEnum.JWT_ERROR_CODE_EXPIRE.getDesc())
+                    .errCode(ResponseCodeEnum.JWT_ERROR_CODE_EXPIRE.getCode())
                     .build();
         } catch (UnsupportedJwtException e ) {
             return TokenDTO.builder()
                     .status(HttpStatus.UNAUTHORIZED)
-                    .msg("Unsupported JWT Token")
+                    .msg(ResponseCodeEnum.JWT_ERROR_CODE_UNSUPPORTED.getDesc())
+                    .errCode(ResponseCodeEnum.JWT_ERROR_CODE_UNSUPPORTED.getCode())
                     .build();
         } catch (IllegalArgumentException e ) {
             return TokenDTO.builder()
                     .status(HttpStatus.UNAUTHORIZED)
-                    .msg("JWT Token compact of handler are invalid.")
+                    .msg(ResponseCodeEnum.JWT_ERROR_CODE_COMPACT_INVALID.getDesc())
+                    .errCode(ResponseCodeEnum.JWT_ERROR_CODE_COMPACT_INVALID.getCode())
                     .build();
         }
     }

@@ -3,6 +3,7 @@ package com.example.sample.domain.dto.request;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -13,9 +14,11 @@ public class ReqMemberModifyDTO {
     @NotBlank
     @Size(max=20)
     String id ;
+
     @ApiModelProperty(value = "수정할 핸드폰번호")
     @Size(max=11)
     String phone;
+
     @ApiModelProperty(value = "수정할 주소 ")
     @Size(max=150)
     String addr;

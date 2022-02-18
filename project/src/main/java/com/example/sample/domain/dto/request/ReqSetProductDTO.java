@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 
-@NoArgsConstructor
-@Builder
-@AllArgsConstructor
 @ApiModel(value = "상품 등록", description = "상품 등록시 사용되는 정보")
+@NoArgsConstructor
 @Data
 public class ReqSetProductDTO {
     @NotNull
@@ -43,7 +41,6 @@ public class ReqSetProductDTO {
     @Min(value = 1)
     @ApiModelProperty(value = "이벤트 키", required = true)
     private Long eventNum;
-
 
 
 }

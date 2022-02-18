@@ -7,7 +7,6 @@ import com.example.sample.common.utils.CodeGenerator;
 import com.example.sample.common.utils.JwtUtils;
 import com.example.sample.common.utils.ResponseUtils;
 import com.example.sample.common.utils.SecurityUtils;
-import com.example.sample.domain.dto.request.ReqSignInEmailDTO;
 import com.example.sample.domain.dto.response.ResTokenDTO;
 import com.example.sample.domain.dto.request.ReqSignInDTO;
 import com.example.sample.domain.entity.Member;
@@ -84,7 +83,7 @@ public class AuthService {
                 .build();
         // 로그인 기록을 저장 한뒤 응답
         repositoryAuth.save(memberAccess);
-        user.setAcceptAt(LocalDateTime.now());
+        user.updateAcceptAt(LocalDateTime.now());
         return response.makeSuccessResponse(ResTokenDTO.builder().token(token).build());
     }
 
@@ -103,7 +102,7 @@ public class AuthService {
         }
         log.debug("claims : "+data.toString());
         MemberAccess memberAccess = repositoryAuth.findBySessionId(data.get("session").toString());
-        memberAccess.setOutDate(LocalDateTime.now());
+        memberAccess.updateOutDate(LocalDateTime.now());
         return response.makeSuccessResponse(HttpStatus.OK);
     }
 }

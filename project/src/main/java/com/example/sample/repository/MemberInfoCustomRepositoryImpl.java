@@ -17,7 +17,7 @@ public class MemberInfoCustomRepositoryImpl implements MemberInfoCustomRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ResMemberInfosDTO> findAllMembers(Long targetIdx,int size) {
+    public List<ResMemberInfosDTO> findAllMembers(Long targetIdx,int size)  {
         return queryFactory.select(
                     Projections.constructor(
                             ResMemberInfosDTO.class,

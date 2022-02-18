@@ -4,7 +4,6 @@ package com.example.sample.domain.entity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -12,7 +11,6 @@ import javax.persistence.*;
 @Table(name = "ORDER_INFO")
 @Entity
 @Getter
-@Setter
 @DynamicUpdate
 @NoArgsConstructor
 public class OrderInfo extends BaseTime {
@@ -61,9 +59,20 @@ public class OrderInfo extends BaseTime {
     @ManyToOne(targetEntity = Member.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Member userIdx;
 
+    public void updateProductName(String productName) {
+        this.productName = productName;
+    }
 
+    public void updatePaymentPrice(int totalPrice) {
+        this.paymentPrice = totalPrice;
+    }
+
+    public void updateProductCount(int size) {
+        this.productCount = size;
+    }
 
     public static final class OrderBuilder {
+        private Long idx;
         private String orderNo;
         private String userId;
         private String productName;
@@ -84,6 +93,11 @@ public class OrderInfo extends BaseTime {
         }
         public OrderInfo.OrderBuilder withOrderNo(String orderNo) {
             this.orderNo = orderNo;
+            return this;
+        }
+
+        public OrderInfo.OrderBuilder withIdx(Long idx) {
+            this.idx = idx;
             return this;
         }
 

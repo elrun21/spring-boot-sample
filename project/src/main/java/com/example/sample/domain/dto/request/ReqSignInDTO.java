@@ -14,6 +14,7 @@ public class ReqSignInDTO {
     @Size(max=20)
     @ApiModelProperty(value = "로그인 아이디", required = true)
     private  String id ;
+
     @NotBlank
     @Size(max=20)
     @ApiModelProperty(value = "로그인 패스워드", required = true)

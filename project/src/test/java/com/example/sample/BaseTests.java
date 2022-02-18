@@ -26,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 public class BaseTests {
-    private  final String DEFAULT_MEMBER_API_URL = "/api/member";
-    private final String  DEFAULT_ORDER_API_URL = "/api/order";
-    private final String  DEFAULT_PRODUCT_API_URL = "/api/product";
+    private static final  String DEFAULT_MEMBER_API_URL = "/api/member";
+    private static final  String  DEFAULT_ORDER_API_URL = "/api/order";
+    private static final  String  DEFAULT_PRODUCT_API_URL = "/api/product";
     @Autowired
     ObjectMapper objectMapper;
 
@@ -38,7 +38,7 @@ public class BaseTests {
     @Autowired
     WebApplicationContext ctx;
 
-    public ReqSignUpMembeDTO getSignUpSuccessCase() {
+    protected ReqSignUpMembeDTO getSignUpSuccessCase() {
         // Given
         ReqSignUpMembeDTO request = new ReqSignUpMembeDTO();
         request.setAddr("테스트 주소입니다");
@@ -50,7 +50,7 @@ public class BaseTests {
         return request;
     }
 
-    public Map getLoginInfo() throws Exception {
+    protected Map getLoginInfo() throws Exception {
 
         MvcResult make = mockMvc.perform(post(DEFAULT_MEMBER_API_URL + "/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +78,7 @@ public class BaseTests {
         return content;
     }
 
-    public Long setSignUp() throws Exception {
+    protected Long setSignUp() throws Exception {
         MvcResult member= mockMvc.perform(post(DEFAULT_MEMBER_API_URL+"/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(getSignUpSuccessCase()))
@@ -97,21 +97,20 @@ public class BaseTests {
         List<ReqSetProductDTO> list = new ArrayList<>();
         String productNamePrefix = "새우깡";
         for ( int i = 0 ; i < count ; i++){
-            list.add(
-                    ReqSetProductDTO.builder()
-                            .salePrice(200)
-                            .productPrice(100)
-                            .productName(productNamePrefix+i)
-                            .productType("NR")
-                            .category(1L)
-                            .eventNum(1L)
-                            .build()
-            );
+            ReqSetProductDTO obj = new ReqSetProductDTO();
+            obj.setProductPrice(100);
+            obj.setSalePrice(200);
+            obj.setProductPrice(100);
+            obj.setProductName(productNamePrefix+i);
+            obj.setProductType("NR");
+            obj.setCategory(1L);
+            obj.setEventNum(1L) ;
+            list.add(obj);
         }
         return list;
     }
 
-    public List<Long> makeProduct(int count) throws Exception{
+    protected List<Long> makeProduct(int count) throws Exception{
         List<ReqSetProductDTO> list = getProductList(count);
         List<Long> products = new ArrayList<>();
         for( ReqSetProductDTO temp : list){

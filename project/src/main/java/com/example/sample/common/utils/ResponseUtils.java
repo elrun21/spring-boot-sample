@@ -2,6 +2,7 @@ package com.example.sample.common.utils;
 
 import com.example.sample.common.enums.CommonEnum;
 import com.example.sample.common.dto.CommonResponseDTO;
+import com.example.sample.common.enums.ResponseCodeEnum;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,10 +19,19 @@ public class ResponseUtils {
      * @return ResponseEntity
      */
     public ResponseEntity makeSuccessResponse(Object result  ){
-        CommonResponseDTO resData = CommonResponseDTO.builder().code(0).msg("success").content(result).build();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName(CommonEnum.COMMON_ENCODE_CHARTER_SET.getValue())));
-        return new ResponseEntity<>( resData, headers , HttpStatus.OK );
+        CommonResponseDTO resData = null;
+        if ( result == null ) {
+            return new ResponseEntity<>(resData, headers, HttpStatus.NO_CONTENT);
+        }else {
+            resData = CommonResponseDTO.builder()
+                    .code(ResponseCodeEnum.SUCCESS.getCode())
+                    .msg(ResponseCodeEnum.SUCCESS.getDesc())
+                    .content(result).build();
+            return new ResponseEntity<>(resData, headers, HttpStatus.OK);
+        }
+
     }
 
     /**

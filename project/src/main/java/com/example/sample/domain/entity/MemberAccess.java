@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +13,6 @@ import java.time.LocalDateTime;
 @Table(name = "MEMBER_ACCESS")
 @Entity
 @Getter
-@Setter
 @DynamicUpdate
 @NoArgsConstructor
 public class MemberAccess {
@@ -40,6 +40,10 @@ public class MemberAccess {
     @ManyToOne( targetEntity = Member.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="member_idx")
     private Member memberIdx;
+
+    public void updateOutDate(LocalDateTime now) {
+        this.outDate = now;
+    }
 
     public static final class MemberAccessBuilder {
         private String sessionId;

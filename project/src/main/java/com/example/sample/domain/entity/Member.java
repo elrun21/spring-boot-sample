@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Table(name = "MEMBER")
 @Entity
 @Getter
-@Setter
 @DynamicUpdate
 @NoArgsConstructor
 public class Member extends BaseTime{
@@ -50,6 +49,18 @@ public class Member extends BaseTime{
     @ApiModelProperty("최근 접속일")
     @Column
     private LocalDateTime acceptAt ;
+
+    public void updateAcceptAt(LocalDateTime now) {
+        this.acceptAt = now;
+    }
+
+    public void updateLiveStatus(String code) {
+        this.liveStatus = code;
+    }
+
+    public void updateDeleteAt(LocalDateTime now) {
+        this.deleteAt = now ;
+    }
 
     public static final class MemberBuilder {
         private Long idx;

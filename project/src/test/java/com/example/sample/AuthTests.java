@@ -1,13 +1,9 @@
 package com.example.sample;
 
 import com.example.sample.domain.dto.request.ReqSignInDTO;
-import com.example.sample.domain.dto.request.ReqSignInEmailDTO;
 import com.example.sample.domain.dto.request.ReqSignUpMembeDTO;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +19,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class AuthTests extends BaseTests{
 
-    private String url =  "/api/auth/sign-in";
-    private String url_sign_out =  "/api/auth/sign-out";
-    private String member_url =  "/api/member/sign-up";
+    private static final  String url =  "/api/auth/sign-in";
+    private static final String url_sign_out =  "/api/auth/sign-out";
+    private static final String member_url =  "/api/member/sign-up";
 
+    /**
+     * 회원_로그인_컨트롤러_성공_테스트
+     * @throws Exception
+     */
     @Test
-    public  void 회원_로그인_컨트롤러_성공_테스트() throws Exception {
+    public  void memberLoginSucess() throws Exception {
 
         ReqSignUpMembeDTO requestMake = new ReqSignUpMembeDTO();
         requestMake.setId("test-02");
@@ -57,8 +57,12 @@ public class AuthTests extends BaseTests{
                 .andDo(print());
     }
 
+    /**
+     * 회원_로그인_컨트롤러_실패_삭제된계정접속
+     * @throws Exception
+     */
     @Test
-    public  void 회원_로그인_컨트롤러_실패_삭제된계정접속() throws Exception {
+    public  void memberLoginFailCase01() throws Exception {
         /** 삭제된 계정 접속**/
         //given
         ReqSignInDTO request = new ReqSignInDTO();
@@ -73,8 +77,13 @@ public class AuthTests extends BaseTests{
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
+    /**
+     * 회원_로그인_컨트롤러_실패_비밀번호틀린경우
+     * @throws Exception
+     */
     @Test
-    public  void 회원_로그인_컨트롤러_실패_비밀번호틀린경우() throws Exception {
+    public  void memberLoginFailCase02() throws Exception {
         ReqSignUpMembeDTO requestMake = new ReqSignUpMembeDTO();
         requestMake.setId("test-02");
         requestMake.setPassword("1234");
@@ -101,8 +110,13 @@ public class AuthTests extends BaseTests{
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
+
+    /**
+     * 회원_로그인_컨트롤러_실패_아이디가없음
+     * @throws Exception
+     */
     @Test
-    public  void 회원_로그인_컨트롤러_실패_아이디가없음() throws Exception {
+    public  void memberLoginFailCase03() throws Exception {
         /** 없는 계정 접속**/
         //given
         ReqSignInDTO request = new ReqSignInDTO();
@@ -117,9 +131,12 @@ public class AuthTests extends BaseTests{
     }
 
 
-
+    /**
+     * 회원_로그아웃_컨트롤러_성공
+     * @throws Exception
+     */
     @Test
-    public  void 회원_로그아웃_컨트롤러_성공() throws Exception {
+    public  void memberLoginFailCase04() throws Exception {
         ReqSignUpMembeDTO requestMake = new ReqSignUpMembeDTO();
         requestMake.setId("test-02");
         requestMake.setPassword("1234");
@@ -162,8 +179,12 @@ public class AuthTests extends BaseTests{
                 .andDo(print());
     }
 
+    /**
+     * 회원_로그아웃_컨트롤러_실패_테스트
+     * @throws Exception
+     */
     @Test
-    public  void 회원_로그아웃_컨트롤러_실패_테스트() throws Exception {
+    public  void memberLoginFailCase05() throws Exception {
 
 
         String url = url_sign_out;
