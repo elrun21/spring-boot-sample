@@ -2,16 +2,13 @@ package com.example.sample.domain.dto.request;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.*;
 
 @ApiModel(value = "상품 등록", description = "상품 등록시 사용되는 정보")
-@NoArgsConstructor
-@Data
+@Setter
+@Getter
 public class ReqSetProductDTO {
     @NotNull
     @Min(value = 1)

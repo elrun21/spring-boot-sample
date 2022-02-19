@@ -3,12 +3,15 @@ package com.example.sample.domain.dto.request;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 @ApiModel(value = "회원 정보 수정", description = "회원 수정시 사용되는 정보")
-@Data
+@Getter
+@Setter
 public class ReqMemberModifyDTO {
     @ApiModelProperty(value = "로그인 한 아이디", required = true)
     @NotBlank

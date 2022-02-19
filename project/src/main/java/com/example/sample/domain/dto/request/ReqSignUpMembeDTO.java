@@ -3,13 +3,16 @@ package com.example.sample.domain.dto.request;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @ApiModel(value = "회원 가입", description = "회원가입시 사용되는 정보")
-@Data
+@Getter
+@Setter
 public class ReqSignUpMembeDTO {
     @NotBlank
     @Size(max=20)

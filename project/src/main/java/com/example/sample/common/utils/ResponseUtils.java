@@ -19,6 +19,7 @@ public class ResponseUtils {
      * @return ResponseEntity
      */
     public ResponseEntity makeSuccessResponse(Object result  ){
+        if( result == null ) result = "";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName(CommonEnum.COMMON_ENCODE_CHARTER_SET.getValue())));
         CommonResponseDTO resData = null;

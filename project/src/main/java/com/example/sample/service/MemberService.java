@@ -30,6 +30,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -54,11 +55,10 @@ public class MemberService {
         Long idx = Long.parseLong(strIdx);
         // 사용자 정보 조회
         try {
-            MemberInfo memberInfo = repositoryMemberInfo.findMemberInfoByMemberIdx(
-                    Member.MemberBuilder.aMember().withIdx(idx).build()
-            );
-
-            if (memberInfo == null) return response.makeOtherResponse(HttpStatus.NO_CONTENT);
+            Optional<MemberInfo> findMemberData = repositoryMemberInfo.findById(idx);
+            if (findMemberData == null) return response.makeOtherResponse(HttpStatus.NO_CONTENT);
+            if (findMemberData.isEmpty()) return response.makeOtherResponse(HttpStatus.NO_CONTENT);
+            MemberInfo memberInfo = findMemberData.get();
             Member member = memberInfo.getMemberIdx();
             // 전달할 객체 세팅 후 전달
             ResMemberInfoDTO result = ResMemberInfoDTO.builder()
@@ -103,7 +103,6 @@ public class MemberService {
                     .withLiveStatus("LIVE")
                     .withUserGrade(1)
                     .withEmail(data.getEmail())
-                    .withDeleteAt(null)
                     .build()
             );
 
@@ -152,9 +151,10 @@ public class MemberService {
             Long idx = getIdx(tokenData.getData(), id);
             // 탈퇴할 사용자 정보 조회
             Member member = repositoryMember.findByIdx(idx);
-            if (member == null)
+            if (member == null) {
                 // 탈퇴 상태값 변경
                 member.updateLiveStatus(MemberEnum.USER_STATE_DELETE.getCode());
+            }
             member.updateDeleteAt(LocalDateTime.now());
             return response.makeOtherResponse(HttpStatus.NO_CONTENT);
         } catch (Exception e) {

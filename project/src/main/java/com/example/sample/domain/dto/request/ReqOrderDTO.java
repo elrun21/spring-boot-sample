@@ -3,13 +3,16 @@ package com.example.sample.domain.dto.request;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @ApiModel(value = "회원 상세 정보(단건)")
-@Data
+@Getter
+@Setter
 public class ReqOrderDTO {
     @NotNull
     @ApiModelProperty(value = "사용자 식별키 "   , required = true)

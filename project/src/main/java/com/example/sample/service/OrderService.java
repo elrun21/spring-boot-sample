@@ -47,8 +47,9 @@ public class OrderService {
 
             String orderNumber = generator.makeCode("OR");
             Member member = memberRepository.findByIdx(data.getUserIdx());
+            if ( member == null ) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
             List<SaleProductInfo> list = data.getProductInfo();
-
+            if ( list == null || list.size() < 0)  return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
             int totalPrice = 0;
             int productStrCnt = list.size() - 1;
             String productName = "";
@@ -65,7 +66,7 @@ public class OrderService {
                             .withUserIdx(member)
                             .build()
             );
-
+            if ( order == null ) throw new RuntimeException("OrderCreateException");
             for (SaleProductInfo info : list) {
                 long idx = info.getProductIdx();
                 int cnt = info.getProductCount();
@@ -91,7 +92,7 @@ public class OrderService {
                 }
                 int sumPrice = product.getSalePrice() * cnt;
                 totalPrice += sumPrice;
-                orderProductRepository.save(OrderProduct.OrderProductBuilder.aOrderProduct()
+                OrderProduct orderProduct = orderProductRepository.save(OrderProduct.OrderProductBuilder.aOrderProduct()
                         .withProductCount(cnt)
                         .withProductPrice(product.getOriginPrice())
                         .withSalePrice(product.getSalePrice())
@@ -100,23 +101,27 @@ public class OrderService {
                         .withProductIdx(product)
                         .build()
                 );
+                if ( orderProduct == null ) throw new RuntimeException("OrderProductCreateException");
             }
             order.updateProductName(productName);
             order.updatePaymentPrice(totalPrice);
             order.updateProductCount(list.size());
-            orderRepository.save(order);
 
-            ResOrderDTO result = new ResOrderDTO();
-            result.setOrderIdx(order.getIdx());
-            result.setOrderNumber(orderNumber);
-            result.setProductName(productName);
-            result.setTotalPrice(totalPrice);
-            result.setTotalCount(productStrCnt + 1);
-            result.setPaymentType(order.getPaymentType());
-            result.setOrderDate(order.getCreateAt());
-            result.setSender(member.getId());
-            result.setReceiver(order.getReceiver());
-            result.setAddr(order.getAddr());
+            ResOrderDTO result = ResOrderDTO.builder()
+                    .orderIdx(order.getIdx())
+                    .orderNumber(orderNumber)
+                    .productName(productName)
+                    .totalPrice(totalPrice)
+                    .totalCount(productStrCnt + 1)
+                    .paymentType(order.getPaymentType())
+                    .orderDate(order.getCreateAt())
+                    .sender(member.getId())
+                    .receiver(order.getReceiver())
+                    .addr(order.getAddr())
+                    .build().validationNullData();
+            if ( result == null ) {
+                throw new RuntimeException("MakeOrderResultCreateException");
+            }
             return response.makeSuccessResponse(result);
 
         } catch (Exception e) {
@@ -130,6 +135,7 @@ public class OrderService {
         Long userIdx = jwt.getUserIdx(token);
         Member member = memberRepository.findByIdx(userIdx);
         if (limit == 0) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+        if (member == null ) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
         List<ResOrderDTO> result = orderRepository.findOrder(member, targetIdx, productName, limit);
         return response.makeSuccessResponse(result);
     }

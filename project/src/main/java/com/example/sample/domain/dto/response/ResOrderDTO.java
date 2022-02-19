@@ -6,51 +6,70 @@ import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @ApiModel(value = "주문 정보")
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
+@Getter
 public class ResOrderDTO {
     @ApiModelProperty(value = "주문 식별키")
-    @NonNull
     private Long orderIdx;
 
     @ApiModelProperty(value = "주문 번호")
-    @NonNull
     private String orderNumber;
 
     @ApiModelProperty(value = "결제 상품명")
-    @NonNull
     private String productName;
 
     @ApiModelProperty(value = "결제 금액")
-    @NonNull
     private int totalPrice;
 
     @ApiModelProperty(value = "결제 갯수")
-    @NonNull
     private int totalCount;
 
     @ApiModelProperty(value = "결제 방법")
-    @NonNull
     private String paymentType;
 
     @ApiModelProperty(value = "주문일")
-    @NonNull
     private LocalDateTime orderDate;
 
     @ApiModelProperty(value = "구매자")
-    @NonNull
     private String sender;
 
     @ApiModelProperty(value = "수령자")
-    @NonNull
     private String receiver;
 
     @ApiModelProperty(value = "배송지")
-    @NonNull
     private String addr;
 
+    @Builder
+    public ResOrderDTO(Long orderIdx, String orderNumber, String productName, int totalPrice, int totalCount, String paymentType, LocalDateTime orderDate, String sender, String receiver, String addr) {
+        this.orderIdx = orderIdx;
+        this.orderNumber = orderNumber;
+        this.productName = productName;
+        this.totalPrice = totalPrice;
+        this.totalCount = totalCount;
+        this.paymentType = paymentType;
+        this.orderDate = orderDate;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.addr = addr;
+    }
 
+    public ResOrderDTO validationNullData(){
+        boolean check = Stream.of(
+                this.getOrderIdx(),
+                this.getOrderNumber(),
+                this.getTotalCount(),
+                this.getProductName(),
+                this.getTotalPrice(),
+                this.getReceiver(),
+                this.getAddr()
+        ).allMatch(Objects::nonNull);
+        if( check ) {
+            return this;
+        }else {
+            return null;
+        }
+    }
 }

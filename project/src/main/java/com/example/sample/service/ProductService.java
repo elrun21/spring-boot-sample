@@ -28,8 +28,14 @@ public class ProductService {
 
     public ResponseEntity findProduct(Long targetIdx, String name, int limit) {
         if( limit == 0 ) return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
-        List<ResProductDTO> result = productCustomRepository.findProduct(targetIdx,name, limit);
-        return response.makeSuccessResponse( result );
+        try {
+            List<ResProductDTO> result = productCustomRepository.findProduct(targetIdx, name, limit);
+            return response.makeSuccessResponse( result );
+        }catch(Exception e) {
+            logUtils.getErrorLog(e);
+            return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+        }
+
 
     }
     @Transactional
@@ -45,11 +51,15 @@ public class ProductService {
                     .build()
             );
             if (newProductInfo == null) return response.makeOtherResponse(HttpStatus.BAD_REQUEST, ResponseCodeEnum.PRODUCT_NOT_CREATE.getDesc(), ResponseCodeEnum.PRODUCT_NOT_CREATE.getCode());
-            return response.makeSuccessResponse(
-                    ResSetProductDTO.builder()
-                            .productIdx(newProductInfo.getIdx())
-                            .build()
-            );
+            ResSetProductDTO result = ResSetProductDTO.builder()
+                    .productIdx(newProductInfo.getIdx())
+                    .build().validationNullData();
+            if (result == null ) {
+                return response.makeOtherResponse(HttpStatus.BAD_REQUEST);
+            }else {
+                return response.makeSuccessResponse(result);
+            }
+
         }catch(Exception e){
             log.error(logUtils.getErrorLog(e));
             throw new RuntimeException("ProductCreateException");

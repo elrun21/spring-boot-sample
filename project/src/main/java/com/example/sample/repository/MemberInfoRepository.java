@@ -5,6 +5,6 @@ import com.example.sample.domain.entity.MemberInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberInfoRepository extends JpaRepository<MemberInfo, Long > , MemberInfoCustomRepository {
-     MemberInfo findMemberInfoByMemberIdx(Member memer) ;
+     MemberInfo findMemberInfoByMemberIdx(Member idx) ;
 
 }

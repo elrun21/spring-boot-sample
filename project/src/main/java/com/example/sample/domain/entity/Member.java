@@ -63,7 +63,7 @@ public class Member extends BaseTime{
     }
 
     public static final class MemberBuilder {
-        private Long idx;
+
         private String id ;
         private String email;
         private String password;
@@ -79,10 +79,7 @@ public class Member extends BaseTime{
             return new MemberBuilder();
         }
 
-        public MemberBuilder withIdx(Long idx) {
-            this.idx = idx;
-            return this;
-        }
+
 
         public MemberBuilder withId(String id) {
             this.id = id;
@@ -123,7 +120,6 @@ public class Member extends BaseTime{
             member.id = this.id;
             member.email=this.email;
             member.password = this.password;
-            member.idx = this.idx;
             member.liveStatus = this.liveStatus;
             member.userGrade = this.userGrade;
             member.deleteAt = this.deleteAt;
